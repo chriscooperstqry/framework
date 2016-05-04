@@ -5,6 +5,7 @@ import android.content.Context;
 import javax.inject.Singleton;
 
 import dagger.Component;
+import nz.co.cjc.base.features.base.logic.CoreViewLogic;
 import nz.co.cjc.base.framework.application.MainApp;
 import nz.co.cjc.base.framework.buildconfig.dagger.DaggerModuleBuildConfig;
 import nz.co.cjc.base.framework.dagger.modules.DaggerModuleLibrary;
@@ -65,5 +66,12 @@ public interface LibraryComponent {
      * @param mainApp to inject.
      */
     void inject(MainApp mainApp);
+
+    /**
+     * Create an instance of the core view logic.
+     *
+     * @return core view logic.
+     */
+    CoreViewLogic createCoreViewLogic();
     //end region
 }

@@ -35,6 +35,8 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import se.akerfeldt.okhttp.signpost.OkHttpOAuthConsumer;
+import se.akerfeldt.okhttp.signpost.SigningInterceptor;
 
 /**
  * Created by Chris Cooper on 4/05/16.
@@ -77,9 +79,13 @@ public class DefaultNetworkRequestProvider implements NetworkRequestProvider {
 
         mConnectivityManager = (ConnectivityManager) mApplicationContext.getSystemService(Context.CONNECTIVITY_SERVICE);
 
+        //Use signpost library to set the authorization needed
+        OkHttpOAuthConsumer consumer = new OkHttpOAuthConsumer(mStringsProvider.get(R.string.consumer_key), mStringsProvider.get(R.string.consumer_secret));
+
         OkHttpClient.Builder builder = new OkHttpClient.Builder().connectTimeout(REQUEST_TIMEOUT_SECONDS, TimeUnit.SECONDS)
                 .readTimeout(REQUEST_TIMEOUT_SECONDS, TimeUnit.SECONDS)
-                .writeTimeout(REQUEST_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+                .writeTimeout(REQUEST_TIMEOUT_SECONDS, TimeUnit.SECONDS).addInterceptor(new SigningInterceptor(consumer));
+
         // Configure a response cache for OkHttp so we get some free bandwidth / battery preservation.
         try {
             File responseCacheDirectory = new File(mApplicationContext.getCacheDir(), RESPONSE_CACHE_DIRECTORY);

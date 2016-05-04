@@ -47,6 +47,10 @@ dependencies {
     // OkHttp: http://square.github.io/okhttp/
     compile 'com.squareup.okhttp3:okhttp:3.2.0'
 
+    //https://github.com/pakerfeldt/okhttp-signpost
+    compile 'se.akerfeldt:okhttp-signpost:1.1.0'
+    compile 'oauth.signpost:signpost-core:1.2.1.2'
+
     // Glide: https://github.com/bumptech/glide
     compile 'com.github.bumptech.glide:glide:3.7.0'
 
