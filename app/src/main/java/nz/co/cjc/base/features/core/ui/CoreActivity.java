@@ -1,10 +1,10 @@
-package nz.co.cjc.base.features.base.ui;
+package nz.co.cjc.base.features.core.ui;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 
-import nz.co.cjc.base.features.base.logic.CoreViewLogic;
+import nz.co.cjc.base.features.core.logic.CoreViewLogic;
 import nz.co.cjc.base.framework.application.MainApp;
 import nz.co.cjc.base.framework.network.models.NetworkRequestProperties;
 import nz.co.cjc.base.framework.network.providers.contracts.NetworkRequestDelegate;

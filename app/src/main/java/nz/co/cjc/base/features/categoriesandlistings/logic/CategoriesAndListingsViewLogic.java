@@ -1,4 +1,4 @@
-package nz.co.cjc.base.features.base.logic;
+package nz.co.cjc.base.features.categoriesandlistings.logic;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -10,13 +10,13 @@ import nz.co.cjc.base.framework.strings.providers.contracts.StringsProvider;
 
 /**
  * Created by Chris Cooper on 4/05/16.
- * <p/>
- * View logic for the core activity
+ *
+ * view logic for the categories and listings activity
  */
-public class CoreViewLogic extends BaseViewLogic<CoreViewLogic.ViewLogicDelegate> {
+public class CategoriesAndListingsViewLogic extends BaseViewLogic<CategoriesAndListingsViewLogic.ViewLogicDelegate> {
 
     @Inject
-    public CoreViewLogic(@NonNull StringsProvider stringsProvider) {
+    public CategoriesAndListingsViewLogic(@NonNull StringsProvider stringsProvider) {
         super(ViewLogicDelegate.class, stringsProvider);
     }
 
@@ -24,8 +24,7 @@ public class CoreViewLogic extends BaseViewLogic<CoreViewLogic.ViewLogicDelegate
         setDelegate(delegate);
     }
 
-    public interface ViewLogicDelegate {
-    //Empty at the moment
-    }
+    public interface ViewLogicDelegate{
 
+    }
 }

@@ -5,7 +5,8 @@ import android.content.Context;
 import javax.inject.Singleton;
 
 import dagger.Component;
-import nz.co.cjc.base.features.base.logic.CoreViewLogic;
+import nz.co.cjc.base.features.categoriesandlistings.logic.CategoriesAndListingsViewLogic;
+import nz.co.cjc.base.features.core.logic.CoreViewLogic;
 import nz.co.cjc.base.framework.application.MainApp;
 import nz.co.cjc.base.framework.buildconfig.dagger.DaggerModuleBuildConfig;
 import nz.co.cjc.base.framework.dagger.modules.DaggerModuleLibrary;
@@ -73,5 +74,12 @@ public interface LibraryComponent {
      * @return core view logic.
      */
     CoreViewLogic createCoreViewLogic();
+
+    /**
+     * Create an instance of the categories and listings view logic
+     *
+     * @return The view logic
+     */
+    CategoriesAndListingsViewLogic createCategoriesAndListingsViewLogic();
     //end region
 }
