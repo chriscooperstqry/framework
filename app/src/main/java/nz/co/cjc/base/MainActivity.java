@@ -1,4 +1,4 @@
-package nz.co.cjc.framework;
+package nz.co.cjc.base;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
