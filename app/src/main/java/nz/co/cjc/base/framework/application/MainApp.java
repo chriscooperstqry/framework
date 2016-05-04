@@ -33,12 +33,7 @@ public class MainApp extends Application {
      * method can be overridden in child classes
      * of the MainApp class, to provide different
      * implementations of elements in the Dagger
-     * mapping. For example, the network request
-     * provider is mapped to a different implementation
-     * for the Espresso suite of tests to provide
-     * a 'canned' way of responding to specific
-     * url requests during automated tests.
-     *
+     * mapping.
      * @return constructed Dagger component.
      */
     @NonNull
