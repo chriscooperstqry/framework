@@ -1,13 +1,18 @@
 package nz.co.cjc.base;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+
+import nz.co.cjc.base.framework.application.MainApp;
+import nz.co.cjc.base.framework.network.models.NetworkRequestProperties;
+import nz.co.cjc.base.framework.network.providers.contracts.NetworkRequestDelegate;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -26,6 +31,29 @@ public class MainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+
+
+        NetworkRequestProperties properties = NetworkRequestProperties.create().url("https://api.tmsandbox.co.nz/v1/Listings/1234567890.json").respondOnMainThread(false);
+        MainApp.getDagger().getNetworkRequestProvider().startRequest(properties, new NetworkRequestDelegate() {
+            @Override
+            public void onRequestComplete(int statusCode, @NonNull String response) {
+              MainApp.getDagger().getLoggingProvider().d("response " +response);
+            }
+
+            @Override
+            public void onRequestFailed(int statusCode, @NonNull String response) {
+                MainApp.getDagger().getLoggingProvider().d("failed " +response);
+
+            }
+
+            @Override
+            public void onConnectionFailed() {
+                MainApp.getDagger().getLoggingProvider().d("connect failed ");
+
+            }
+        });
+
+
     }
 
     @Override

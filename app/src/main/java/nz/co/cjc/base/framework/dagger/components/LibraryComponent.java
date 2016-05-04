@@ -6,9 +6,13 @@ import javax.inject.Singleton;
 
 import dagger.Component;
 import nz.co.cjc.base.framework.application.MainApp;
+import nz.co.cjc.base.framework.buildconfig.dagger.DaggerModuleBuildConfig;
 import nz.co.cjc.base.framework.dagger.modules.DaggerModuleLibrary;
 import nz.co.cjc.base.framework.eventbus.dagger.DaggerModuleEventBus;
 import nz.co.cjc.base.framework.logging.dagger.DaggerModuleLogging;
+import nz.co.cjc.base.framework.logging.providers.contracts.LoggingProvider;
+import nz.co.cjc.base.framework.network.dagger.DaggerModuleNetwork;
+import nz.co.cjc.base.framework.network.providers.contracts.NetworkRequestProvider;
 import nz.co.cjc.base.framework.strings.dagger.DaggerModuleStrings;
 import nz.co.cjc.base.framework.threading.dagger.DaggerModuleThreadUtils;
 
@@ -24,7 +28,9 @@ import nz.co.cjc.base.framework.threading.dagger.DaggerModuleThreadUtils;
         DaggerModuleStrings.class,
         DaggerModuleEventBus.class,
         DaggerModuleThreadUtils.class,
-        DaggerModuleLogging.class
+        DaggerModuleLogging.class,
+        DaggerModuleNetwork.class,
+        DaggerModuleBuildConfig.class
 })
 public interface LibraryComponent {
     //region Providers
@@ -35,6 +41,20 @@ public interface LibraryComponent {
      * @return application context.
      */
     Context getApplicationContext();
+
+    /**
+     * Resolve the network request provider.
+     *
+     * @return resolved network request provider.
+     */
+    NetworkRequestProvider getNetworkRequestProvider();
+
+    /**
+     * Resolve the logging provider
+     *
+     * @return resolved logging provider
+     */
+    LoggingProvider getLoggingProvider();
     //end region
 
     //region injection
