@@ -6,9 +6,12 @@ import javax.inject.Singleton;
 
 import dagger.Component;
 import nz.co.cjc.base.features.categoriesandlistings.logic.CategoriesAndListingsViewLogic;
+import nz.co.cjc.base.features.categoriesandlistings.ui.CategoriesFragment;
+import nz.co.cjc.base.features.categoriesandlistings.ui.ListingsFragment;
 import nz.co.cjc.base.features.core.logic.CoreViewLogic;
 import nz.co.cjc.base.framework.application.MainApp;
 import nz.co.cjc.base.framework.buildconfig.dagger.DaggerModuleBuildConfig;
+import nz.co.cjc.base.framework.categoriesandlistings.dagger.DaggerModuleCategoriesAndListings;
 import nz.co.cjc.base.framework.dagger.modules.DaggerModuleLibrary;
 import nz.co.cjc.base.framework.eventbus.dagger.DaggerModuleEventBus;
 import nz.co.cjc.base.framework.logging.dagger.DaggerModuleLogging;
@@ -32,7 +35,8 @@ import nz.co.cjc.base.framework.threading.dagger.DaggerModuleThreadUtils;
         DaggerModuleThreadUtils.class,
         DaggerModuleLogging.class,
         DaggerModuleNetwork.class,
-        DaggerModuleBuildConfig.class
+        DaggerModuleBuildConfig.class,
+        DaggerModuleCategoriesAndListings.class
 })
 public interface LibraryComponent {
     //region Providers
@@ -81,5 +85,19 @@ public interface LibraryComponent {
      * @return The view logic
      */
     CategoriesAndListingsViewLogic createCategoriesAndListingsViewLogic();
+
+    /**
+     * Injection for the categories fragment
+     *
+     * @param categoriesFragment to inject
+     */
+    void inject(CategoriesFragment categoriesFragment);
+
+    /**
+     * Injection for the listings fragment
+     *
+     * @param listingsFragment to inject
+     */
+    void inject(ListingsFragment listingsFragment);
     //end region
 }

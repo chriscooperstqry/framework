@@ -3,7 +3,9 @@ package nz.co.cjc.base.framework.eventbus.providers.contracts;
 import android.support.annotation.NonNull;
 
 /**
- * Created by Marcel Braghetto on 15/07/15.
+ * Created by Chris Cooper on 4/05/16.
+ *
+ * **Architecture code **
  *
  * Provider to control the application event bus
  * to allow for decoupled communication at an

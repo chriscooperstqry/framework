@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Strings-->
+    <string name="http_request_base_url">https://api.tmsandbox.co.nz/v1/</string>
+    <string name="consumer_key">718D06B4CCC44D8A57EAD1D423063D94</string>
+    <string name="consumer_secret">20C062E7DBF21AB612C161D19A7DCA10</string>
+
+</resources>

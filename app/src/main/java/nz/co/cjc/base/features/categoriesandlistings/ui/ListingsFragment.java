@@ -11,27 +11,27 @@ import android.widget.ListView;
 
 import javax.inject.Inject;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import nz.co.cjc.base.R;
-import nz.co.cjc.base.features.categoriesandlistings.logic.CategoriesViewLogic;
+import nz.co.cjc.base.features.categoriesandlistings.logic.ListingsViewLogic;
 import nz.co.cjc.base.framework.application.MainApp;
 
 /**
- * Created by Chris Cooper on 4/05/16.
+ * Created by Chris Cooper on 5/05/16.
  * <p/>
- * Fragment to display the categories received from the api
+ * Fragment to display the listings related to a category received from the api
  */
-public class CategoriesFragment extends Fragment {
+public class ListingsFragment extends Fragment {
 
-    private ListView mListView;
+    @BindView(R.id.list_view) ListView mListView;
 
     @Inject
-    CategoriesViewLogic mViewLogic;
+    ListingsViewLogic mViewLogic;
 
-    // region public
     @NonNull
-    public static CategoriesFragment newInstance() {
-        return new CategoriesFragment();
+    public static ListingsFragment newInstance() {
+        return new ListingsFragment();
     }
 
     @Override
@@ -45,7 +45,9 @@ public class CategoriesFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.categories_fragment, container, false);
+        View view = inflater.inflate(R.layout.listings_fragment, container, false);
+        ButterKnife.bind(this, view);
+        return view;
     }
 
     @Override
@@ -63,15 +65,12 @@ public class CategoriesFragment extends Fragment {
             mViewLogic = null;
         }
     }
-    //end region
 
-    //region private
     private void initUI(View view) {
-        mListView = ButterKnife.findById(view, R.id.list_view);
+        ButterKnife.bind(this, view);
     }
-    //end region
 
-    private CategoriesViewLogic.ViewLogicDelegate mViewLogicDelegate = new CategoriesViewLogic.ViewLogicDelegate() {
+    private ListingsViewLogic.ViewLogicDelegate mViewLogicDelegate = new ListingsViewLogic.ViewLogicDelegate() {
 
     };
 
