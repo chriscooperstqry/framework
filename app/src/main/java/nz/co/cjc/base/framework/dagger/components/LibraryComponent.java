@@ -19,6 +19,7 @@ import nz.co.cjc.base.framework.logging.providers.contracts.LoggingProvider;
 import nz.co.cjc.base.framework.network.dagger.DaggerModuleNetwork;
 import nz.co.cjc.base.framework.network.providers.contracts.NetworkRequestProvider;
 import nz.co.cjc.base.framework.strings.dagger.DaggerModuleStrings;
+import nz.co.cjc.base.framework.strings.providers.contracts.StringsProvider;
 import nz.co.cjc.base.framework.threading.dagger.DaggerModuleThreadUtils;
 
 /**
@@ -61,6 +62,13 @@ public interface LibraryComponent {
      * @return resolved logging provider
      */
     LoggingProvider getLoggingProvider();
+
+    /**
+     * Resolve the strings provider
+     *
+     * @return resolved strings provider
+     */
+    StringsProvider getStringsProvider();
     //end region
 
     //region injection

@@ -3,15 +3,13 @@
     android:id="@+id/categories_fragment_root"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#c03"
-    android:clickable="true">
+    android:layout_height="match_parent">
 
-    <ListView
+    <se.emilsjolander.stickylistheaders.StickyListHeadersListView
         android:id="@+id/list_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:divider="#ededed"
         android:dividerHeight="1dp">
-    </ListView>
-
+    </se.emilsjolander.stickylistheaders.StickyListHeadersListView>
 </RelativeLayout>

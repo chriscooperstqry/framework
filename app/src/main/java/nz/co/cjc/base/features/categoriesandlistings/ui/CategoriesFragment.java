@@ -7,7 +7,6 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
 
 import java.util.List;
 
@@ -18,6 +17,7 @@ import nz.co.cjc.base.R;
 import nz.co.cjc.base.features.categoriesandlistings.logic.CategoriesViewLogic;
 import nz.co.cjc.base.features.categoriesandlistings.models.CategoryData;
 import nz.co.cjc.base.framework.application.MainApp;
+import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 
 /**
  * Created by Chris Cooper on 4/05/16.
@@ -26,7 +26,7 @@ import nz.co.cjc.base.framework.application.MainApp;
  */
 public class CategoriesFragment extends Fragment {
 
-    private ListView mListView;
+    private StickyListHeadersListView mListView;
     private CategoriesAdapter mAdapter;
 
     @Inject

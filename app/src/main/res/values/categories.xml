@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="categories_url">Categories/0.json</string>
+
+    <string name="sticky_header_trade_me_category">Trade Me Categories</string>
+    <string name="sticky_header_trade_me_suffix">Trade Me</string>
+
+    <dimen name="view_holder_category_name_margins">16dp</dimen>
+    <dimen name="view_holder_category_height">50dp</dimen>
+
 </resources>

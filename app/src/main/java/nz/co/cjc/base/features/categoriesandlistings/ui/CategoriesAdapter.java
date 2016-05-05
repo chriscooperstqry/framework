@@ -13,18 +13,24 @@ import java.util.List;
 import butterknife.ButterKnife;
 import nz.co.cjc.base.R;
 import nz.co.cjc.base.features.categoriesandlistings.models.CategoryData;
+import nz.co.cjc.base.framework.application.MainApp;
+import nz.co.cjc.base.framework.strings.providers.contracts.StringsProvider;
+import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
 
 /**
  * Created by Chris Cooper on 5/05/16.
  * <p/>
- * Adapter for displaying the categories in the list view
+ * Adapter for displaying the categories in the list view.
+ * Also implements sticky headers for showing the category alphabetically
  */
-public class CategoriesAdapter extends BaseAdapter {
+public class CategoriesAdapter extends BaseAdapter implements StickyListHeadersAdapter {
 
     private List<CategoryData> mCategoryItems;
+    private final StringsProvider mStringsProvider;
 
     public CategoriesAdapter() {
         mCategoryItems = new ArrayList<>();
+        mStringsProvider = MainApp.getDagger().getStringsProvider();
     }
 
     public void setCategoryItems(@NonNull List<CategoryData> categoryItems) {
@@ -66,12 +72,47 @@ public class CategoriesAdapter extends BaseAdapter {
         return convertView;
     }
 
+    @Override
+    public View getHeaderView(int position, View convertView, ViewGroup parent) {
+        HeaderViewHolder headerViewHolder;
+        if (convertView == null) {
+            convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.viewholder_category_sticky_header, parent, false);
+            headerViewHolder = new HeaderViewHolder(convertView);
+            convertView.setTag(headerViewHolder);
+        } else {
+            headerViewHolder = (HeaderViewHolder) convertView.getTag();
+        }
+
+        //Categorise the trade me items differently
+        if (mCategoryItems.get(position).getName().startsWith(mStringsProvider.get(R.string.sticky_header_trade_me_suffix))) {
+            headerViewHolder.headerName.setText(mStringsProvider.get(R.string.sticky_header_trade_me_category));
+        } else {
+            headerViewHolder.headerName.setText(new StringBuilder().append(mCategoryItems.get(position).getName().charAt(0)));
+        }
+
+        return convertView;
+    }
+
+    @Override
+    public long getHeaderId(int position) {
+        //Categorise the trade me items differently
+        if (mCategoryItems.get(position).getName().startsWith(mStringsProvider.get(R.string.sticky_header_trade_me_suffix))) {
+            return -1;
+        }
+        return mCategoryItems.get(position).getName().charAt(0);
+    }
+
     private static class ViewHolder {
-
         public TextView categoryName;
-
         public ViewHolder(View view) {
             categoryName = ButterKnife.findById(view, R.id.name);
+        }
+    }
+
+    private static class HeaderViewHolder {
+        public TextView headerName;
+        public HeaderViewHolder(View view) {
+            headerName = ButterKnife.findById(view, R.id.header);
         }
     }
 }

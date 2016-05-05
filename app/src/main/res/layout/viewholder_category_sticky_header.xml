@@ -4,11 +4,11 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="@dimen/view_holder_category_height"
-    android:background="@android:color/white"
-    android:clickable="true">
+    android:background="#ededed"
+    android:clickable="false">
 
     <TextView
-        android:id="@+id/name"
+        android:id="@+id/header"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
