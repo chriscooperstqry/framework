@@ -7,9 +7,9 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import nz.co.cjc.base.features.categoriesandlistings.models.CategoryData;
+import nz.co.cjc.base.features.categoriesandlistings.providers.contract.CategoriesAndListingsProvider;
 import nz.co.cjc.base.framework.application.MainApp;
-import nz.co.cjc.base.framework.categoriesandlistings.models.CategoryData;
-import nz.co.cjc.base.framework.categoriesandlistings.providers.contract.CategoriesAndListingsProvider;
 import nz.co.cjc.base.framework.core.logic.BaseViewLogic;
 import nz.co.cjc.base.framework.strings.providers.contracts.StringsProvider;
 
@@ -37,7 +37,7 @@ public class CategoriesViewLogic extends BaseViewLogic<CategoriesViewLogic.ViewL
         mCategoriesAndListingsProvider.getCategoriesData(new CategoriesAndListingsProvider.CategoriesRequestDelegate() {
             @Override
             public void requestSuccess(@NonNull List<CategoryData> categories) {
-                MainApp.getDagger().getLoggingProvider().d("success");
+                mDelegate.populateScreen(categories);
             }
 
             @Override
@@ -50,5 +50,11 @@ public class CategoriesViewLogic extends BaseViewLogic<CategoriesViewLogic.ViewL
 
     public interface ViewLogicDelegate {
 
+        /**
+         * Populate the given list of categories to the user
+         *
+         * @param categories to present
+         */
+        void populateScreen(@NonNull List<CategoryData> categories);
     }
 }

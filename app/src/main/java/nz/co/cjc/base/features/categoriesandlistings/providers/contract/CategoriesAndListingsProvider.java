@@ -1,10 +1,10 @@
-package nz.co.cjc.base.framework.categoriesandlistings.providers.contract;
+package nz.co.cjc.base.features.categoriesandlistings.providers.contract;
 
 import android.support.annotation.NonNull;
 
 import java.util.List;
 
-import nz.co.cjc.base.framework.categoriesandlistings.models.CategoryData;
+import nz.co.cjc.base.features.categoriesandlistings.models.CategoryData;
 
 /**
  * Created by Chris Cooper on 5/05/16.

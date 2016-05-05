@@ -5,13 +5,13 @@ import android.content.Context;
 import javax.inject.Singleton;
 
 import dagger.Component;
+import nz.co.cjc.base.features.categoriesandlistings.dagger.DaggerModuleCategoriesAndListings;
 import nz.co.cjc.base.features.categoriesandlistings.logic.CategoriesAndListingsViewLogic;
 import nz.co.cjc.base.features.categoriesandlistings.ui.CategoriesFragment;
 import nz.co.cjc.base.features.categoriesandlistings.ui.ListingsFragment;
 import nz.co.cjc.base.features.core.logic.CoreViewLogic;
 import nz.co.cjc.base.framework.application.MainApp;
 import nz.co.cjc.base.framework.buildconfig.dagger.DaggerModuleBuildConfig;
-import nz.co.cjc.base.framework.categoriesandlistings.dagger.DaggerModuleCategoriesAndListings;
 import nz.co.cjc.base.framework.dagger.modules.DaggerModuleLibrary;
 import nz.co.cjc.base.framework.eventbus.dagger.DaggerModuleEventBus;
 import nz.co.cjc.base.framework.logging.dagger.DaggerModuleLogging;

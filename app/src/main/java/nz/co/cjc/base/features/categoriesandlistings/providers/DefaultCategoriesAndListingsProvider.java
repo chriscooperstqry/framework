@@ -1,4 +1,4 @@
-package nz.co.cjc.base.framework.categoriesandlistings.providers;
+package nz.co.cjc.base.features.categoriesandlistings.providers;
 
 import android.support.annotation.NonNull;
 
@@ -11,8 +11,8 @@ import com.google.gson.reflect.TypeToken;
 import java.util.List;
 
 import nz.co.cjc.base.R;
-import nz.co.cjc.base.framework.categoriesandlistings.models.CategoryData;
-import nz.co.cjc.base.framework.categoriesandlistings.providers.contract.CategoriesAndListingsProvider;
+import nz.co.cjc.base.features.categoriesandlistings.models.CategoryData;
+import nz.co.cjc.base.features.categoriesandlistings.providers.contract.CategoriesAndListingsProvider;
 import nz.co.cjc.base.framework.network.models.NetworkRequestProperties;
 import nz.co.cjc.base.framework.network.providers.contracts.NetworkRequestDelegate;
 import nz.co.cjc.base.framework.network.providers.contracts.NetworkRequestProvider;

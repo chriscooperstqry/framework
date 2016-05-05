@@ -9,11 +9,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
+import java.util.List;
+
 import javax.inject.Inject;
 
 import butterknife.ButterKnife;
 import nz.co.cjc.base.R;
 import nz.co.cjc.base.features.categoriesandlistings.logic.CategoriesViewLogic;
+import nz.co.cjc.base.features.categoriesandlistings.models.CategoryData;
 import nz.co.cjc.base.framework.application.MainApp;
 
 /**
@@ -24,6 +27,7 @@ import nz.co.cjc.base.framework.application.MainApp;
 public class CategoriesFragment extends Fragment {
 
     private ListView mListView;
+    private CategoriesAdapter mAdapter;
 
     @Inject
     CategoriesViewLogic mViewLogic;
@@ -68,11 +72,18 @@ public class CategoriesFragment extends Fragment {
     //region private
     private void initUI(View view) {
         mListView = ButterKnife.findById(view, R.id.list_view);
+        mAdapter = new CategoriesAdapter();
+        mListView.setAdapter(mAdapter);
     }
     //end region
 
     private CategoriesViewLogic.ViewLogicDelegate mViewLogicDelegate = new CategoriesViewLogic.ViewLogicDelegate() {
 
+        @Override
+        public void populateScreen(@NonNull List<CategoryData> categories) {
+            mAdapter.setCategoryItems(categories);
+
+        }
     };
 
 }
