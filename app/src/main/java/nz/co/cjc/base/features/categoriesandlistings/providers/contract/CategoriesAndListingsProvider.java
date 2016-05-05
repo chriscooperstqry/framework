@@ -17,8 +17,10 @@ public interface CategoriesAndListingsProvider {
      * Retrieve the categories from the api
      *
      * @param requestDelegate to callback to
+     * @param categoryNumber  Number corresponding to the category you wish to retrieve categories for.
+     *                        If not supplied, will return all categories.
      */
-    void getCategoriesData(@NonNull final CategoriesRequestDelegate requestDelegate);
+    void getCategoriesData(@NonNull String categoryNumber, @NonNull final CategoriesRequestDelegate requestDelegate);
 
     /**
      * Callback for the request to retrieve the categories

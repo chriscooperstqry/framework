@@ -1,8 +1,10 @@
 package nz.co.cjc.base.framework.application;
 
 import android.app.Application;
+import android.os.Build;
 import android.support.annotation.NonNull;
 
+import nz.co.cjc.base.framework.constants.AppConstants;
 import nz.co.cjc.base.framework.dagger.components.DaggerLibraryComponent;
 import nz.co.cjc.base.framework.dagger.components.LibraryComponent;
 import nz.co.cjc.base.framework.dagger.modules.DaggerModuleLibrary;
@@ -26,6 +28,10 @@ public class MainApp extends Application {
         mLibraryComponent = buildDaggerLibraryComponent();
         mLibraryComponent.inject(this);
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            AppConstants.RIPPLE_DELAY = 200;
+        }
+
     }
 
     /**
@@ -34,6 +40,7 @@ public class MainApp extends Application {
      * of the MainApp class, to provide different
      * implementations of elements in the Dagger
      * mapping.
+     *
      * @return constructed Dagger component.
      */
     @NonNull

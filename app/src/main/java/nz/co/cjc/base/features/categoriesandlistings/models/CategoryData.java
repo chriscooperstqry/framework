@@ -1,5 +1,7 @@
 package nz.co.cjc.base.features.categoriesandlistings.models;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
 import com.google.gson.annotations.SerializedName;
@@ -14,7 +16,7 @@ import nz.co.cjc.base.framework.utils.StringUtils;
  * <p/>
  * Model class representing a category returned from the api
  */
-public class CategoryData {
+public class CategoryData implements Parcelable {
 
     @SerializedName("Name")
     private String mName;
@@ -49,5 +51,37 @@ public class CategoryData {
             return new ArrayList<>();
         }
         return mSubCategories;
+    }
+
+    protected CategoryData(Parcel in) {
+        mName = in.readString();
+        mNumber = in.readString();
+        mPath = in.readString();
+        mSubCategories = in.createTypedArrayList(CategoryData.CREATOR);
+    }
+
+    public static final Creator<CategoryData> CREATOR = new Creator<CategoryData>() {
+        @Override
+        public CategoryData createFromParcel(Parcel in) {
+            return new CategoryData(in);
+        }
+
+        @Override
+        public CategoryData[] newArray(int size) {
+            return new CategoryData[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(mName);
+        dest.writeString(mNumber);
+        dest.writeString(mPath);
+        dest.writeTypedList(mSubCategories);
     }
 }

@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<nz.co.cjc.base.framework.views.FRelativeLayout
     android:id="@+id/root"
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="@dimen/view_holder_category_height"
     android:background="@android:color/white"
-    android:clickable="true">
+    app:foreground="@drawable/ripple_selector_no_mask">
 
     <TextView
         android:id="@+id/name"
@@ -19,4 +20,4 @@
         android:textColor="@android:color/black"
         android:textSize="18sp"/>
 
-</RelativeLayout>
+</nz.co.cjc.base.framework.views.FRelativeLayout>

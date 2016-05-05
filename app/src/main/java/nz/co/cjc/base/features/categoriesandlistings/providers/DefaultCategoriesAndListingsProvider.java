@@ -42,9 +42,15 @@ public class DefaultCategoriesAndListingsProvider implements CategoriesAndListin
     }
 
     @Override
-    public void getCategoriesData(@NonNull final CategoriesRequestDelegate requestDelegate) {
+    public void getCategoriesData(@NonNull String categoryNumber, @NonNull final CategoriesRequestDelegate requestDelegate) {
 
-        String url = mNetworkRequestProvider.getBaseUrl() + mStringsProvider.get(R.string.categories_url);
+        if (StringUtils.isEmpty(categoryNumber)) {
+            categoryNumber = "0";
+        }
+        String url = mNetworkRequestProvider.getBaseUrl()
+                + mStringsProvider.get(R.string.categories_url)
+                + categoryNumber
+                + mStringsProvider.get(R.string.http_request_file_format);
 
         NetworkRequestProperties networkRequestProperties = NetworkRequestProperties.create().url(url).respondOnMainThread(false);
 

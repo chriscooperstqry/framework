@@ -35,6 +35,22 @@ public class CategoriesAndListingsActivity extends CoreActivity {
         mViewLogic.initViewLogic(mViewLogicDelegate);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (mViewLogic != null) {
+            mViewLogic.screenResumed();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (mViewLogic != null) {
+            mViewLogic.screenPaused();
+        }
+    }
+
     private void initUI() {
         setContentView(R.layout.categories_and_listings_activity);
         mCategoriesContainer = ButterKnife.findById(this, R.id.categories_container);
@@ -44,11 +60,14 @@ public class CategoriesAndListingsActivity extends CoreActivity {
 
     private CategoriesAndListingsViewLogic.ViewLogicDelegate mViewLogicDelegate = new CategoriesAndListingsViewLogic.ViewLogicDelegate() {
         @Override
-        public void presentFragment(@NonNull Fragment fragment, int fragmentContainerId) {
+        public void presentFragment(@NonNull Fragment fragment, int fragmentContainerId, boolean addToBackStack) {
 
             FragmentManager fragmentManager = getSupportFragmentManager();
             FragmentTransaction transaction = fragmentManager.beginTransaction();
-            transaction.replace(fragmentContainerId, fragment);
+            transaction.add(fragmentContainerId, fragment);
+            if (addToBackStack) {
+                transaction.addToBackStack(null);
+            }
             transaction.commit();
             fragmentManager.executePendingTransactions();
         }

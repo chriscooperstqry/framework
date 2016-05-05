@@ -1,12 +1,14 @@
 package nz.co.cjc.base.features.categoriesandlistings.ui;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 
 import java.util.List;
 
@@ -17,6 +19,7 @@ import nz.co.cjc.base.R;
 import nz.co.cjc.base.features.categoriesandlistings.logic.CategoriesViewLogic;
 import nz.co.cjc.base.features.categoriesandlistings.models.CategoryData;
 import nz.co.cjc.base.framework.application.MainApp;
+import nz.co.cjc.base.framework.constants.AppConstants;
 import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 
 /**
@@ -34,8 +37,10 @@ public class CategoriesFragment extends Fragment {
 
     // region public
     @NonNull
-    public static CategoriesFragment newInstance() {
-        return new CategoriesFragment();
+    public static CategoriesFragment newInstance(@NonNull Bundle arguments) {
+        CategoriesFragment categoriesFragment = new CategoriesFragment();
+        categoriesFragment.setArguments(arguments);
+        return categoriesFragment;
     }
 
     @Override
@@ -44,7 +49,7 @@ public class CategoriesFragment extends Fragment {
 
         initUI(view);
         MainApp.getDagger().inject(this);
-        mViewLogic.initViewLogic(mViewLogicDelegate);
+        mViewLogic.initViewLogic(mViewLogicDelegate, getArguments());
     }
 
     @Override
@@ -74,6 +79,21 @@ public class CategoriesFragment extends Fragment {
         mListView = ButterKnife.findById(view, R.id.list_view);
         mAdapter = new CategoriesAdapter();
         mListView.setAdapter(mAdapter);
+
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (mViewLogic != null) {
+                            mViewLogic.listItemSelected(position);
+                        }
+                    }
+                }, AppConstants.RIPPLE_DELAY);
+
+            }
+        });
     }
     //end region
 
@@ -82,7 +102,6 @@ public class CategoriesFragment extends Fragment {
         @Override
         public void populateScreen(@NonNull List<CategoryData> categories) {
             mAdapter.setCategoryItems(categories);
-
         }
     };
 

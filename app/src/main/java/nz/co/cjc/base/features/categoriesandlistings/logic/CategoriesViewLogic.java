@@ -1,16 +1,21 @@
 package nz.co.cjc.base.features.categoriesandlistings.logic;
 
+import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
 
+import nz.co.cjc.base.features.categoriesandlistings.events.CategoryEvent;
 import nz.co.cjc.base.features.categoriesandlistings.models.CategoryData;
 import nz.co.cjc.base.features.categoriesandlistings.providers.contract.CategoriesAndListingsProvider;
 import nz.co.cjc.base.framework.application.MainApp;
 import nz.co.cjc.base.framework.core.logic.BaseViewLogic;
+import nz.co.cjc.base.framework.eventbus.providers.contracts.EventBusProvider;
 import nz.co.cjc.base.framework.strings.providers.contracts.StringsProvider;
 
 /**
@@ -20,32 +25,60 @@ import nz.co.cjc.base.framework.strings.providers.contracts.StringsProvider;
  */
 public class CategoriesViewLogic extends BaseViewLogic<CategoriesViewLogic.ViewLogicDelegate> {
 
+    public static final String SUBCATEGORIES = "Subcategories";
+
     private final StringsProvider mStringsProvider;
     private final CategoriesAndListingsProvider mCategoriesAndListingsProvider;
+    private final EventBusProvider mEventBusProvider;
+    private List<CategoryData> mCategoryItems;
 
     @Inject
     public CategoriesViewLogic(@NonNull StringsProvider stringsProvider,
-                               @NonNull CategoriesAndListingsProvider categoriesAndListingsProvider) {
+                               @NonNull CategoriesAndListingsProvider categoriesAndListingsProvider,
+                               @NonNull EventBusProvider eventBusProvider) {
         super(ViewLogicDelegate.class, stringsProvider);
         mStringsProvider = stringsProvider;
         mCategoriesAndListingsProvider = categoriesAndListingsProvider;
+        mEventBusProvider = eventBusProvider;
     }
 
-    public void initViewLogic(@Nullable ViewLogicDelegate delegate) {
+    public void initViewLogic(@Nullable ViewLogicDelegate delegate, @NonNull Bundle arguments) {
         setDelegate(delegate);
 
-        mCategoriesAndListingsProvider.getCategoriesData(new CategoriesAndListingsProvider.CategoriesRequestDelegate() {
-            @Override
-            public void requestSuccess(@NonNull List<CategoryData> categories) {
-                mDelegate.populateScreen(categories);
-            }
+        mCategoryItems = new ArrayList<>();
 
-            @Override
-            public void requestFailed() {
-                MainApp.getDagger().getLoggingProvider().d("failed");
-            }
-        });
+        ArrayList<CategoryData> bundleSubcategories = arguments.getParcelableArrayList(SUBCATEGORIES);
 
+        if (bundleSubcategories != null) {
+            mCategoryItems = bundleSubcategories;
+            mDelegate.populateScreen(mCategoryItems);
+        } else {
+            mCategoriesAndListingsProvider.getCategoriesData("", new CategoriesAndListingsProvider.CategoriesRequestDelegate() {
+                @Override
+                public void requestSuccess(@NonNull List<CategoryData> categories) {
+                    mCategoryItems = categories;
+                    mDelegate.populateScreen(categories);
+                }
+
+                @Override
+                public void requestFailed() {
+                    //TODO present error
+                    MainApp.getDagger().getLoggingProvider().d("failed");
+                }
+            });
+
+        }
+
+    }
+
+    public void listItemSelected(int position) {
+        CategoryData item = mCategoryItems.get(position);
+        Bundle bundle = new Bundle();
+
+        if (!item.getSubCategories().isEmpty()) {
+            bundle.putParcelableArrayList(SUBCATEGORIES, (ArrayList<? extends Parcelable>) item.getSubCategories());
+            mEventBusProvider.postEvent(new CategoryEvent(null, CategoryEvent.EventType.CategorySelected, bundle));
+        }
     }
 
     public interface ViewLogicDelegate {
