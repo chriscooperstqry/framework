@@ -76,15 +76,15 @@ public class CategoriesAndListingsViewLogic extends BaseViewLogic<CategoriesAndL
                     throw new IllegalArgumentException("Must provide category data");
                 }
 
-                addToolbarText(categoryData.getName());
 
                 List<CategoryData> subcategories = categoryData.getSubCategories();
-                String categoryNumber = categoryData.getNumber();
-
-                mListingsStackProvider.addListing(categoryData);
-                mEventBusProvider.postEvent(new ListingsEvent(null, ListingsEvent.EventType.UpdateListings, categoryNumber));
 
                 if (!subcategories.isEmpty()) {
+                    String categoryNumber = categoryData.getNumber();
+                    addToolbarText(categoryData.getName());
+
+                    mListingsStackProvider.addListing(categoryData);
+                    mEventBusProvider.postEvent(new ListingsEvent(null, ListingsEvent.EventType.UpdateListings, categoryNumber));
 
                     Fragment categoriesFragment = CategoriesFragment.newInstance(event.getBundle());
                     mDelegate.presentFragment(categoriesFragment, R.id.categories_container, true);
