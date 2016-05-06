@@ -5,6 +5,8 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.greenrobot.eventbus.Subscribe;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,6 +18,7 @@ import nz.co.cjc.base.features.categoriesandlistings.providers.contract.Categori
 import nz.co.cjc.base.framework.application.MainApp;
 import nz.co.cjc.base.framework.core.logic.BaseViewLogic;
 import nz.co.cjc.base.framework.eventbus.providers.contracts.EventBusProvider;
+import nz.co.cjc.base.framework.eventbus.providers.contracts.EventBusSubscriber;
 import nz.co.cjc.base.framework.strings.providers.contracts.StringsProvider;
 
 /**
@@ -23,7 +26,7 @@ import nz.co.cjc.base.framework.strings.providers.contracts.StringsProvider;
  * <p>
  * View logic for the categories fragment
  */
-public class CategoriesViewLogic extends BaseViewLogic<CategoriesViewLogic.ViewLogicDelegate> {
+public class CategoriesViewLogic extends BaseViewLogic<CategoriesViewLogic.ViewLogicDelegate> implements EventBusSubscriber {
 
     public static final String SUBCATEGORIES = "Subcategories";
     public static final String CATEGORY_NUMBER = "Category.Number";
@@ -78,11 +81,39 @@ public class CategoriesViewLogic extends BaseViewLogic<CategoriesViewLogic.ViewL
         bundle.putString(CATEGORY_NUMBER, item.getNumber());
         bundle.putParcelableArrayList(SUBCATEGORIES, (ArrayList<? extends Parcelable>) item.getSubCategories());
         mEventBusProvider.postEvent(new CategoryEvent(null, CategoryEvent.EventType.CategorySelected, bundle));
-        mDelegate.setSelectedItem(position);
+
+        if (item.getSubCategories().isEmpty()) {
+            mDelegate.setSelectedItem(position);
+        }
     }
 
     public void screenResumed() {
+        subscribeToEventBus();
         mEventBusProvider.postEvent(new CategoryEvent(null, CategoryEvent.EventType.CategoryLayoutReady, null));
+    }
+
+    @Override
+    public void subscribeToEventBus() {
+        mEventBusProvider.subscribe(this);
+    }
+
+    @Override
+    public void unsubscribeFromEventBus() {
+        mEventBusProvider.unsubscribe(this);
+    }
+
+    public void screenPaused() {
+        unsubscribeFromEventBus();
+    }
+
+    @SuppressWarnings("unused")
+    @Subscribe
+    public void onEvent(@NonNull CategoryEvent event) {
+        switch (event.getEventType()) {
+            case ClearCategorySelection:
+                mDelegate.setSelectedItem(-1);
+                break;
+        }
     }
 
     public interface ViewLogicDelegate {
@@ -96,6 +127,7 @@ public class CategoriesViewLogic extends BaseViewLogic<CategoriesViewLogic.ViewL
 
         /**
          * Remember the users selection so we can highlight it
+         *
          * @param position in the adapter
          */
         void setSelectedItem(int position);

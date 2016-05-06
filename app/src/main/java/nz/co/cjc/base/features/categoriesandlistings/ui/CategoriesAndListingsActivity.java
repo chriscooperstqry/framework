@@ -56,9 +56,14 @@ public class CategoriesAndListingsActivity extends CoreActivity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-        if(mViewLogic!=null){
-            mViewLogic.onBackPressed();
+
+        boolean bubbleUp = true;
+        if (mViewLogic != null) {
+            bubbleUp = mViewLogic.onBackPressed();
+        }
+
+        if (bubbleUp) {
+            super.onBackPressed();
         }
     }
 
@@ -90,17 +95,22 @@ public class CategoriesAndListingsActivity extends CoreActivity {
 
         @Override
         public void setSlidingPanelScrollableView() {
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            CategoriesFragment fragment = (CategoriesFragment) fragmentManager.findFragmentById(R.id.categories_container);
-            if (fragment != null && fragment.getListView() != null) {
-                MainApp.getDagger().getLoggingProvider().d("Setting scrollable view");
-                mSlidingPanelLayout.setScrollableView(fragment.getListView());
+            if (mSlidingPanelLayout != null) {
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                CategoriesFragment fragment = (CategoriesFragment) fragmentManager.findFragmentById(R.id.categories_container);
+                if (fragment != null && fragment.getListView() != null) {
+                    MainApp.getDagger().getLoggingProvider().d("Setting scrollable view");
+                    mSlidingPanelLayout.setScrollableView(fragment.getListView());
+                }
             }
         }
 
         @Override
         public void closeSlidingPanel() {
-            mSlidingPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+            if (mSlidingPanelLayout != null) {
+                mSlidingPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+            }
         }
+
     };
 }

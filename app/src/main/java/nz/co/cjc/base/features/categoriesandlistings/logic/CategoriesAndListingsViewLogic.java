@@ -13,9 +13,12 @@ import javax.inject.Inject;
 
 import nz.co.cjc.base.R;
 import nz.co.cjc.base.features.categoriesandlistings.events.CategoryEvent;
+import nz.co.cjc.base.features.categoriesandlistings.events.ListingsEvent;
 import nz.co.cjc.base.features.categoriesandlistings.models.CategoryData;
 import nz.co.cjc.base.features.categoriesandlistings.ui.CategoriesFragment;
 import nz.co.cjc.base.features.categoriesandlistings.ui.ListingsFragment;
+import nz.co.cjc.base.features.listingsstack.providers.DefaultListingStackProvider;
+import nz.co.cjc.base.features.listingsstack.providers.contract.ListingsStackProvider;
 import nz.co.cjc.base.framework.core.logic.BaseViewLogic;
 import nz.co.cjc.base.framework.eventbus.providers.contracts.EventBusProvider;
 import nz.co.cjc.base.framework.eventbus.providers.contracts.EventBusSubscriber;
@@ -29,17 +32,22 @@ import nz.co.cjc.base.framework.strings.providers.contracts.StringsProvider;
 public class CategoriesAndListingsViewLogic extends BaseViewLogic<CategoriesAndListingsViewLogic.ViewLogicDelegate> implements EventBusSubscriber {
 
     private final EventBusProvider mEventBusProvider;
+    private final ListingsStackProvider mListingsStackProvider;
 
     @Inject
     public CategoriesAndListingsViewLogic(@NonNull StringsProvider stringsProvider,
-                                          @NonNull EventBusProvider eventBusProvider) {
+                                          @NonNull EventBusProvider eventBusProvider,
+                                          @NonNull ListingsStackProvider listingsStackProvider) {
         super(ViewLogicDelegate.class, stringsProvider);
         mEventBusProvider = eventBusProvider;
+        mListingsStackProvider = listingsStackProvider;
+
     }
 
     public void initViewLogic(@Nullable ViewLogicDelegate delegate) {
         setDelegate(delegate);
 
+        mListingsStackProvider.addListing("0");
         CategoriesFragment categoriesFragment = CategoriesFragment.newInstance(new Bundle());
         mDelegate.presentFragment(categoriesFragment, R.id.categories_container, false);
 
@@ -63,11 +71,19 @@ public class CategoriesAndListingsViewLogic extends BaseViewLogic<CategoriesAndL
             case CategorySelected:
 
                 ArrayList<CategoryData> subcategories = event.getBundle().getParcelableArrayList(CategoriesViewLogic.SUBCATEGORIES);
+                String categoryNumber = event.getBundle().getString(CategoriesViewLogic.CATEGORY_NUMBER);
+
+                mListingsStackProvider.addListing(categoryNumber);
+                mEventBusProvider.postEvent(new ListingsEvent(null, ListingsEvent.EventType.UpdateListings, categoryNumber));
+
                 if (subcategories != null && !subcategories.isEmpty()) {
+
                     Fragment categoriesFragment = CategoriesFragment.newInstance(event.getBundle());
                     mDelegate.presentFragment(categoriesFragment, R.id.categories_container, true);
+
                 } else {
                     mDelegate.closeSlidingPanel();
+                    mListingsStackProvider.addListing(DefaultListingStackProvider.END_OF_CATEGORY);
                 }
                 break;
             case CategoryLayoutReady:
@@ -86,9 +102,33 @@ public class CategoriesAndListingsViewLogic extends BaseViewLogic<CategoriesAndL
         mEventBusProvider.unsubscribe(this);
     }
 
-    public void onBackPressed() {
-        mEventBusProvider.postEvent(new CategoryEvent(null, CategoryEvent.EventType.OnBackPress, null));
+    /**
+     * If the back button is pressed, find out if the
+     * the current category is at the end of the sub category chain
+     * and indicate that we have handled this case ourselves
+     * i.e (don't bubble up to the parent).
+     *
+     * @return false if we have handled the back press
+     * ourselves and no further action should be taken.
+     */
+    public boolean onBackPressed() {
+        boolean bubbleUp = true;
+
+        if (mListingsStackProvider.isEndOfListing()) {
+            mListingsStackProvider.removeListing();
+            mEventBusProvider.postEvent(new CategoryEvent(null, CategoryEvent.EventType.ClearCategorySelection, null));
+            bubbleUp = false;
+        }
+
+        mListingsStackProvider.removeListing();
+
+        if (!mListingsStackProvider.isListingsEmpty()) {
+            mEventBusProvider.postEvent(new ListingsEvent(null, ListingsEvent.EventType.UpdateListings, mListingsStackProvider.getTopListing()));
+        }
+
         mDelegate.setSlidingPanelScrollableView();
+
+        return bubbleUp;
     }
 
     public interface ViewLogicDelegate {
@@ -120,5 +160,6 @@ public class CategoriesAndListingsViewLogic extends BaseViewLogic<CategoriesAndL
          * Close the sliding panel so it is hidden
          */
         void closeSlidingPanel();
+
     }
 }

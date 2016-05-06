@@ -62,6 +62,14 @@ public class CategoriesFragment extends Fragment {
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+        if(mViewLogic!=null){
+            mViewLogic.screenPaused();
+        }
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.categories_fragment, container, false);
     }

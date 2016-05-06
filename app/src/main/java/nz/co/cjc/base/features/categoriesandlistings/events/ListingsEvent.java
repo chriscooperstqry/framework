@@ -1,25 +1,22 @@
 package nz.co.cjc.base.features.categoriesandlistings.events;
 
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import nz.co.cjc.base.framework.eventbus.providers.contracts.EventBusEvent;
 
 /**
- * Created by Chris Cooper on 5/05/16.
+ * Created by Chris Cooper on 6/05/16.
  * <p/>
- * Event notifying of a category event
+ * Event notifying of a listings event
  */
-public class CategoryEvent extends EventBusEvent {
+public class ListingsEvent extends EventBusEvent {
 
-    private final Bundle mBundle;
     private final EventType mEventType;
+    private final String mCategoryNumber;
 
     public enum EventType {
-        CategorySelected,
-        CategoryLayoutReady,
-        ClearCategorySelection,
+        UpdateListings
     }
 
     /**
@@ -28,19 +25,14 @@ public class CategoryEvent extends EventBusEvent {
      *
      * @param ownerId as a reference to who create this.
      */
-    public CategoryEvent(@Nullable String ownerId, @NonNull EventType eventType, @Nullable Bundle bundle) {
+    public ListingsEvent(@Nullable String ownerId, @NonNull EventType eventType, @NonNull String categoryNumber) {
         super(ownerId);
-        mBundle = bundle;
         mEventType = eventType;
+        mCategoryNumber = categoryNumber;
     }
 
-    /**
-     * Get the events bundle
-     *
-     * @return The bundle
-     */
-    public Bundle getBundle() {
-        return mBundle;
+    public String getCategoryNumber() {
+        return mCategoryNumber;
     }
 
     /**

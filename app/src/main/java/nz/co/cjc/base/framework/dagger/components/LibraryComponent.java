@@ -10,6 +10,8 @@ import nz.co.cjc.base.features.categoriesandlistings.logic.CategoriesAndListings
 import nz.co.cjc.base.features.categoriesandlistings.ui.CategoriesFragment;
 import nz.co.cjc.base.features.categoriesandlistings.ui.ListingsFragment;
 import nz.co.cjc.base.features.core.logic.CoreViewLogic;
+import nz.co.cjc.base.features.listingsstack.dagger.DaggerModuleListingsStack;
+import nz.co.cjc.base.features.listingsstack.providers.contract.ListingsStackProvider;
 import nz.co.cjc.base.framework.application.MainApp;
 import nz.co.cjc.base.framework.buildconfig.dagger.DaggerModuleBuildConfig;
 import nz.co.cjc.base.framework.dagger.modules.DaggerModuleLibrary;
@@ -25,7 +27,7 @@ import nz.co.cjc.base.framework.threading.dagger.DaggerModuleThreadUtils;
 
 /**
  * Created by Chris Cooper on 4/05/16.
- * <p/>
+ * <p>
  * Registration of all dagger classes
  */
 
@@ -38,7 +40,8 @@ import nz.co.cjc.base.framework.threading.dagger.DaggerModuleThreadUtils;
         DaggerModuleLogging.class,
         DaggerModuleNetwork.class,
         DaggerModuleBuildConfig.class,
-        DaggerModuleCategoriesAndListings.class
+        DaggerModuleCategoriesAndListings.class,
+        DaggerModuleListingsStack.class,
 })
 public interface LibraryComponent {
     //region Providers
@@ -77,6 +80,13 @@ public interface LibraryComponent {
      * @return resolved event bus provider
      */
     EventBusProvider getEventBusProvider();
+
+    /**
+     * Resolve the listings stack provider
+     *
+     * @return resolved listings stack provider
+     */
+    ListingsStackProvider getListingsStackProvider();
     //end region
 
     //region injection

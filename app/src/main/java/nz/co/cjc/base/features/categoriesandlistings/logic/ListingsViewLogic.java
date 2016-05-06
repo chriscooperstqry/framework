@@ -10,7 +10,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import nz.co.cjc.base.features.categoriesandlistings.events.CategoryEvent;
+import nz.co.cjc.base.features.categoriesandlistings.events.ListingsEvent;
 import nz.co.cjc.base.features.categoriesandlistings.models.ListingData;
 import nz.co.cjc.base.features.categoriesandlistings.providers.contract.CategoriesAndListingsProvider;
 import nz.co.cjc.base.framework.application.MainApp;
@@ -25,7 +25,6 @@ import nz.co.cjc.base.framework.strings.providers.contracts.StringsProvider;
  * View logic for the listings fragment
  */
 public class ListingsViewLogic extends BaseViewLogic<ListingsViewLogic.ViewLogicDelegate> implements EventBusSubscriber {
-
 
     private final StringsProvider mStringsProvider;
     private final CategoriesAndListingsProvider mCategoriesAndListingsProvider;
@@ -67,10 +66,15 @@ public class ListingsViewLogic extends BaseViewLogic<ListingsViewLogic.ViewLogic
 
     @SuppressWarnings("unused")
     @Subscribe
-    public void onEvent(@NonNull CategoryEvent event) {
+    public void onEvent(@NonNull ListingsEvent event) {
         switch (event.getEventType()) {
-            case CategorySelected:
-                getListings(event.getBundle().getString(CategoriesViewLogic.CATEGORY_NUMBER));
+            case UpdateListings:
+                if ("0".equals(event.getCategoryNumber())) {
+                    mListingItems.clear();
+                    mDelegate.populateScreen(mListingItems);
+                } else {
+                    getListings(event.getCategoryNumber());
+                }
                 break;
         }
     }
