@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 
 import java.util.Stack;
 
+import nz.co.cjc.base.features.categoriesandlistings.models.CategoryData;
 import nz.co.cjc.base.features.listingsstack.providers.contract.ListingsStackProvider;
 
 /**
@@ -13,22 +14,20 @@ import nz.co.cjc.base.features.listingsstack.providers.contract.ListingsStackPro
  */
 public class DefaultListingStackProvider implements ListingsStackProvider {
 
-    public static final String END_OF_CATEGORY ="End.Of.Category";
-
-    private final Stack<String> mStack;
+    private final Stack<CategoryData> mStack;
 
     public DefaultListingStackProvider() {
         mStack = new Stack<>();
     }
 
     @Override
-    public void addListing(@NonNull String categoryNumber) {
-        mStack.add(categoryNumber);
+    public void addListing(@NonNull CategoryData model) {
+        mStack.add(model);
     }
 
     @NonNull
     @Override
-    public String getTopListing() {
+    public CategoryData getTopListing() {
         return mStack.peek();
     }
 
@@ -38,13 +37,13 @@ public class DefaultListingStackProvider implements ListingsStackProvider {
     }
 
     @Override
-    public boolean isListingsEmpty(){
+    public boolean isListingsEmpty() {
         return mStack.isEmpty();
     }
 
     @Override
-    public boolean isEndOfListing() {
-        return END_OF_CATEGORY.equals(mStack.peek());
+    public boolean isEndOfSubcategory() {
+        return mStack.peek().getSubCategories().isEmpty();
     }
 
 

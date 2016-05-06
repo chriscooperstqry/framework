@@ -18,6 +18,7 @@ import nz.co.cjc.base.framework.core.logic.BaseViewLogic;
 import nz.co.cjc.base.framework.eventbus.providers.contracts.EventBusProvider;
 import nz.co.cjc.base.framework.eventbus.providers.contracts.EventBusSubscriber;
 import nz.co.cjc.base.framework.strings.providers.contracts.StringsProvider;
+import nz.co.cjc.base.framework.utils.StringUtils;
 
 /**
  * Created by Chris Cooper on 5/05/16.
@@ -69,7 +70,7 @@ public class ListingsViewLogic extends BaseViewLogic<ListingsViewLogic.ViewLogic
     public void onEvent(@NonNull ListingsEvent event) {
         switch (event.getEventType()) {
             case UpdateListings:
-                if ("0".equals(event.getCategoryNumber())) {
+                if (StringUtils.isEmpty(event.getCategoryNumber())) {
                     mListingItems.clear();
                     mDelegate.populateScreen(mListingItems);
                 } else {

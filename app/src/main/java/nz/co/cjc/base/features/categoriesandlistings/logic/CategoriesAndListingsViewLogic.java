@@ -7,7 +7,7 @@ import android.support.v4.app.Fragment;
 
 import org.greenrobot.eventbus.Subscribe;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -17,12 +17,12 @@ import nz.co.cjc.base.features.categoriesandlistings.events.ListingsEvent;
 import nz.co.cjc.base.features.categoriesandlistings.models.CategoryData;
 import nz.co.cjc.base.features.categoriesandlistings.ui.CategoriesFragment;
 import nz.co.cjc.base.features.categoriesandlistings.ui.ListingsFragment;
-import nz.co.cjc.base.features.listingsstack.providers.DefaultListingStackProvider;
 import nz.co.cjc.base.features.listingsstack.providers.contract.ListingsStackProvider;
 import nz.co.cjc.base.framework.core.logic.BaseViewLogic;
 import nz.co.cjc.base.framework.eventbus.providers.contracts.EventBusProvider;
 import nz.co.cjc.base.framework.eventbus.providers.contracts.EventBusSubscriber;
 import nz.co.cjc.base.framework.strings.providers.contracts.StringsProvider;
+import nz.co.cjc.base.framework.utils.StringUtils;
 
 /**
  * Created by Chris Cooper on 4/05/16.
@@ -47,7 +47,7 @@ public class CategoriesAndListingsViewLogic extends BaseViewLogic<CategoriesAndL
     public void initViewLogic(@Nullable ViewLogicDelegate delegate) {
         setDelegate(delegate);
 
-        mListingsStackProvider.addListing("0");
+        mListingsStackProvider.addListing(new CategoryData());
         CategoriesFragment categoriesFragment = CategoriesFragment.newInstance(new Bundle());
         mDelegate.presentFragment(categoriesFragment, R.id.categories_container, false);
 
@@ -70,20 +70,25 @@ public class CategoriesAndListingsViewLogic extends BaseViewLogic<CategoriesAndL
         switch (event.getEventType()) {
             case CategorySelected:
 
-                ArrayList<CategoryData> subcategories = event.getBundle().getParcelableArrayList(CategoriesViewLogic.SUBCATEGORIES);
-                String categoryNumber = event.getBundle().getString(CategoriesViewLogic.CATEGORY_NUMBER);
+                CategoryData categoryData = event.getBundle().getParcelable(CategoriesViewLogic.CATEGORY_DATA);
 
-                mListingsStackProvider.addListing(categoryNumber);
+                if (categoryData == null) {
+                    throw new IllegalArgumentException("Must provide category data");
+                }
+
+                List<CategoryData> subcategories = categoryData.getSubCategories();
+                String categoryNumber = categoryData.getNumber();
+
+                mListingsStackProvider.addListing(categoryData);
                 mEventBusProvider.postEvent(new ListingsEvent(null, ListingsEvent.EventType.UpdateListings, categoryNumber));
 
-                if (subcategories != null && !subcategories.isEmpty()) {
+                if (!subcategories.isEmpty()) {
 
                     Fragment categoriesFragment = CategoriesFragment.newInstance(event.getBundle());
                     mDelegate.presentFragment(categoriesFragment, R.id.categories_container, true);
 
                 } else {
                     mDelegate.closeSlidingPanel();
-                    mListingsStackProvider.addListing(DefaultListingStackProvider.END_OF_CATEGORY);
                 }
                 break;
             case CategoryLayoutReady:
@@ -114,8 +119,7 @@ public class CategoriesAndListingsViewLogic extends BaseViewLogic<CategoriesAndL
     public boolean onBackPressed() {
         boolean bubbleUp = true;
 
-        if (mListingsStackProvider.isEndOfListing()) {
-            mListingsStackProvider.removeListing();
+        if (!StringUtils.isEmpty(mListingsStackProvider.getTopListing().getName()) && mListingsStackProvider.isEndOfSubcategory()) {
             mEventBusProvider.postEvent(new CategoryEvent(null, CategoryEvent.EventType.ClearCategorySelection, null));
             bubbleUp = false;
         }
@@ -123,7 +127,7 @@ public class CategoriesAndListingsViewLogic extends BaseViewLogic<CategoriesAndL
         mListingsStackProvider.removeListing();
 
         if (!mListingsStackProvider.isListingsEmpty()) {
-            mEventBusProvider.postEvent(new ListingsEvent(null, ListingsEvent.EventType.UpdateListings, mListingsStackProvider.getTopListing()));
+            mEventBusProvider.postEvent(new ListingsEvent(null, ListingsEvent.EventType.UpdateListings, mListingsStackProvider.getTopListing().getNumber()));
         }
 
         mDelegate.setSlidingPanelScrollableView();

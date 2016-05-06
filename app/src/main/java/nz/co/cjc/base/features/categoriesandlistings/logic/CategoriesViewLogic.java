@@ -1,7 +1,6 @@
 package nz.co.cjc.base.features.categoriesandlistings.logic;
 
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -28,8 +27,7 @@ import nz.co.cjc.base.framework.strings.providers.contracts.StringsProvider;
  */
 public class CategoriesViewLogic extends BaseViewLogic<CategoriesViewLogic.ViewLogicDelegate> implements EventBusSubscriber {
 
-    public static final String SUBCATEGORIES = "Subcategories";
-    public static final String CATEGORY_NUMBER = "Category.Number";
+    public static final String CATEGORY_DATA = "Category.Data";
 
     private final StringsProvider mStringsProvider;
     private final CategoriesAndListingsProvider mCategoriesAndListingsProvider;
@@ -50,10 +48,10 @@ public class CategoriesViewLogic extends BaseViewLogic<CategoriesViewLogic.ViewL
         setDelegate(delegate);
 
         mCategoryItems = new ArrayList<>();
-        ArrayList<CategoryData> bundleSubcategories = arguments.getParcelableArrayList(SUBCATEGORIES);
+        CategoryData categoryData = arguments.getParcelable(CATEGORY_DATA);
 
-        if (bundleSubcategories != null) {
-            mCategoryItems = bundleSubcategories;
+        if  (categoryData != null && !categoryData.getSubCategories().isEmpty()) {
+            mCategoryItems = categoryData.getSubCategories();
             mDelegate.populateScreen(mCategoryItems);
         } else {
             mCategoriesAndListingsProvider.getCategoriesData(null, new CategoriesAndListingsProvider.CategoriesRequestDelegate() {
@@ -76,10 +74,10 @@ public class CategoriesViewLogic extends BaseViewLogic<CategoriesViewLogic.ViewL
 
     public void listItemSelected(int position) {
         CategoryData item = mCategoryItems.get(position);
+        
         Bundle bundle = new Bundle();
+        bundle.putParcelable(CATEGORY_DATA, item);
 
-        bundle.putString(CATEGORY_NUMBER, item.getNumber());
-        bundle.putParcelableArrayList(SUBCATEGORIES, (ArrayList<? extends Parcelable>) item.getSubCategories());
         mEventBusProvider.postEvent(new CategoryEvent(null, CategoryEvent.EventType.CategorySelected, bundle));
 
         if (item.getSubCategories().isEmpty()) {

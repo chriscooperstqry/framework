@@ -2,27 +2,29 @@ package nz.co.cjc.base.features.listingsstack.providers.contract;
 
 import android.support.annotation.NonNull;
 
+import nz.co.cjc.base.features.categoriesandlistings.models.CategoryData;
+
 /**
  * Created by Chris Cooper on 6/05/16.
  * <p>
- * Provider for keeping track of the listings we have viewed
+ * Provider for keeping track of the listings/category we have viewed
  */
 public interface ListingsStackProvider {
 
     /**
      * Add a listing that we're viewing to the stack
      *
-     * @param categoryNumber to add
+     * @param listing to add
      */
-    void addListing(@NonNull String categoryNumber);
+    void addListing(@NonNull CategoryData listing);
 
     /**
      * Get the listing on the top of the stack
      *
-     * @return The category number of the listings
+     * @return The model
      */
     @NonNull
-    String getTopListing();
+    CategoryData getTopListing();
 
     /**
      * Remove the listing at the top of the stack
@@ -37,10 +39,10 @@ public interface ListingsStackProvider {
     boolean isListingsEmpty();
 
     /**
-     * A not so good way of telling us that the current listing has no more
+     * A way of telling us that the current listing has no more
      * sub categories left to view
      *
-     * @return True if this is the last sub category in the chain of listings
+     * @return True if this is the last sub category in the chain
      */
-    boolean isEndOfListing();
+    boolean isEndOfSubcategory();
 }

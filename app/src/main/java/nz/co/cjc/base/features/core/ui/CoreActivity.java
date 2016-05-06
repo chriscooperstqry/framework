@@ -2,7 +2,9 @@ package nz.co.cjc.base.features.core.ui;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 
+import nz.co.cjc.base.R;
 import nz.co.cjc.base.features.core.logic.CoreViewLogic;
 import nz.co.cjc.base.framework.application.MainApp;
 
@@ -14,6 +16,7 @@ import nz.co.cjc.base.framework.application.MainApp;
 public class CoreActivity extends AppCompatActivity {
 
     private CoreViewLogic mViewLogic;
+    public Toolbar mToolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,25 +27,10 @@ public class CoreActivity extends AppCompatActivity {
         mViewLogic = MainApp.getDagger().createCoreViewLogic();
         mViewLogic.initViewLogic(mViewLogicDelegate);
 
-//        NetworkRequestProperties properties = NetworkRequestProperties.create().url("https://api.tmsandbox.co.nz/v1/Listings/3.json").respondOnMainThread(false);
-//        MainApp.getDagger().getNetworkRequestProvider().startRequest(properties, new NetworkRequestDelegate() {
-//            @Override
-//            public void onRequestComplete(int statusCode, @NonNull String response) {
-//                MainApp.getDagger().getLoggingProvider().d("response " + response);
-//            }
-//
-//            @Override
-//            public void onRequestFailed(int statusCode, @NonNull String response) {
-//                MainApp.getDagger().getLoggingProvider().d("failed " + response);
-//
-//            }
-//
-//            @Override
-//            public void onConnectionFailed() {
-//                MainApp.getDagger().getLoggingProvider().d("connect failed ");
-//
-//            }
-//        });
+        // Always cast your custom Toolbar here, and set it as the ActionBar.
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
+
     }
 
     private CoreViewLogic.ViewLogicDelegate mViewLogicDelegate = new CoreViewLogic.ViewLogicDelegate() {

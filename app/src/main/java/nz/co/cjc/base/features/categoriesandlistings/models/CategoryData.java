@@ -53,6 +53,10 @@ public class CategoryData implements Parcelable {
         return mSubCategories;
     }
 
+    public CategoryData(){
+
+    }
+
     protected CategoryData(Parcel in) {
         mName = in.readString();
         mNumber = in.readString();
