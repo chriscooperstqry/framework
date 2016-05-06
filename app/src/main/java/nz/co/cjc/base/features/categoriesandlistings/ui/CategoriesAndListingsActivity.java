@@ -54,6 +54,14 @@ public class CategoriesAndListingsActivity extends CoreActivity {
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        if(mViewLogic!=null){
+            mViewLogic.onBackPressed();
+        }
+    }
+
     private void initUI() {
         setContentView(R.layout.categories_and_listings_activity);
         mCategoriesContainer = ButterKnife.findById(this, R.id.categories_container);
@@ -85,6 +93,7 @@ public class CategoriesAndListingsActivity extends CoreActivity {
             FragmentManager fragmentManager = getSupportFragmentManager();
             CategoriesFragment fragment = (CategoriesFragment) fragmentManager.findFragmentById(R.id.categories_container);
             if (fragment != null && fragment.getListView() != null) {
+                MainApp.getDagger().getLoggingProvider().d("Setting scrollable view");
                 mSlidingPanelLayout.setScrollableView(fragment.getListView());
             }
         }

@@ -20,7 +20,7 @@ import nz.co.cjc.base.framework.strings.providers.contracts.StringsProvider;
 
 /**
  * Created by Chris Cooper on 4/05/16.
- * <p/>
+ * <p>
  * view logic for the categories and listings activity
  */
 public class CategoriesAndListingsViewLogic extends BaseViewLogic<CategoriesAndListingsViewLogic.ViewLogicDelegate> implements EventBusSubscriber {
@@ -80,6 +80,10 @@ public class CategoriesAndListingsViewLogic extends BaseViewLogic<CategoriesAndL
         mEventBusProvider.unsubscribe(this);
     }
 
+    public void onBackPressed() {
+        mDelegate.setSlidingPanelScrollableView();
+    }
+
     public interface ViewLogicDelegate {
 
         /**
@@ -87,7 +91,7 @@ public class CategoriesAndListingsViewLogic extends BaseViewLogic<CategoriesAndL
          *
          * @param fragment            The fragment to present
          * @param fragmentContainerId The view container id of where to put the fragment
-         * @param addToBackStack Whether we want to add this fragment to the back stack or not
+         * @param addToBackStack      Whether we want to add this fragment to the back stack or not
          */
         void presentFragment(@NonNull Fragment fragment, int fragmentContainerId, boolean addToBackStack);
 
@@ -99,6 +103,10 @@ public class CategoriesAndListingsViewLogic extends BaseViewLogic<CategoriesAndL
          */
         boolean isListingsContainerAvailable();
 
+        /**
+         * Sets the sliding panel layouts scrollable view to the
+         * current fragments list view
+         */
         void setSlidingPanelScrollableView();
     }
 }
