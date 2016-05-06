@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Strings -->
+    <string name="listings_url">Search/General</string>
+    <string name="listings_url_category">category=</string>
+
+    <!-- Dimens -->
+    <!--<dimen name="view_holder_category_name_margins">16dp</dimen>-->
+    <!--<dimen name="view_holder_category_height">50dp</dimen>-->
+
+    <!-- Colors-->
+
+</resources>

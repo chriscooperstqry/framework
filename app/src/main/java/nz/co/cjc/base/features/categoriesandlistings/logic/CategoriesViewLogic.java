@@ -26,6 +26,7 @@ import nz.co.cjc.base.framework.strings.providers.contracts.StringsProvider;
 public class CategoriesViewLogic extends BaseViewLogic<CategoriesViewLogic.ViewLogicDelegate> {
 
     public static final String SUBCATEGORIES = "Subcategories";
+    public static final String CATEGORY_NUMBER = "Category.Number";
 
     private final StringsProvider mStringsProvider;
     private final CategoriesAndListingsProvider mCategoriesAndListingsProvider;
@@ -53,7 +54,7 @@ public class CategoriesViewLogic extends BaseViewLogic<CategoriesViewLogic.ViewL
             mCategoryItems = bundleSubcategories;
             mDelegate.populateScreen(mCategoryItems);
         } else {
-            mCategoriesAndListingsProvider.getCategoriesData("", new CategoriesAndListingsProvider.CategoriesRequestDelegate() {
+            mCategoriesAndListingsProvider.getCategoriesData(null, new CategoriesAndListingsProvider.CategoriesRequestDelegate() {
                 @Override
                 public void requestSuccess(@NonNull List<CategoryData> categories) {
                     mCategoryItems = categories;
@@ -76,6 +77,7 @@ public class CategoriesViewLogic extends BaseViewLogic<CategoriesViewLogic.ViewL
         Bundle bundle = new Bundle();
 
         if (!item.getSubCategories().isEmpty()) {
+            bundle.putString(CATEGORY_NUMBER, item.getNumber());
             bundle.putParcelableArrayList(SUBCATEGORIES, (ArrayList<? extends Parcelable>) item.getSubCategories());
             mEventBusProvider.postEvent(new CategoryEvent(null, CategoryEvent.EventType.CategorySelected, bundle));
         }

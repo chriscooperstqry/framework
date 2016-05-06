@@ -40,7 +40,7 @@ import se.akerfeldt.okhttp.signpost.SigningInterceptor;
 
 /**
  * Created by Chris Cooper on 4/05/16.
- * <p/>
+ * <p>
  * Implementation of the network request provider
  * based on the OkHttp library.
  * Refer to http://docs.stqry.com/api/#introduction
@@ -111,6 +111,12 @@ public class DefaultNetworkRequestProvider implements NetworkRequestProvider {
         // If our build config reports that we are not allowed to point at
         // any environments except production, then force production as the url.
         return mStringsProvider.get(R.string.http_request_base_url);
+    }
+
+    @NonNull
+    @Override
+    public String getFileFormat() {
+        return mStringsProvider.get(R.string.http_request_file_format);
     }
 
     @Override

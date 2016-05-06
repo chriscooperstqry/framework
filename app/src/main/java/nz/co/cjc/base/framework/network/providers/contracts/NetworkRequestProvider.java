@@ -7,7 +7,7 @@ import okhttp3.Call;
 
 /**
  * Created by Chris Cooper on 4/05/16.
- * <p/>
+ * <p>
  * Network request contract to provide access to network
  * resources.
  */
@@ -22,6 +22,14 @@ public interface NetworkRequestProvider {
     String getBaseUrl();
 
     /**
+     * Get the file format we wish the api response to be returned as
+     *
+     * @return the file format, eg json, xml
+     */
+    @NonNull
+    String getFileFormat();
+
+    /**
      * Determine whether the host environment currently has networking
      * connectivity.
      *
@@ -31,7 +39,7 @@ public interface NetworkRequestProvider {
 
     /**
      * Initiate a new request with the given network request properties.
-     * <p/>
+     * <p>
      * The result of the request will be returned via the given callback.
      *
      * @param networkRequestProperties containing the configuration for

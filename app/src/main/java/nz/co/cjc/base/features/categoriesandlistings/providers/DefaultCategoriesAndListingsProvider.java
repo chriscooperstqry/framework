@@ -1,6 +1,8 @@
 package nz.co.cjc.base.features.categoriesandlistings.providers;
 
+import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -12,6 +14,7 @@ import java.util.List;
 
 import nz.co.cjc.base.R;
 import nz.co.cjc.base.features.categoriesandlistings.models.CategoryData;
+import nz.co.cjc.base.features.categoriesandlistings.models.ListingData;
 import nz.co.cjc.base.features.categoriesandlistings.providers.contract.CategoriesAndListingsProvider;
 import nz.co.cjc.base.framework.network.models.NetworkRequestProperties;
 import nz.co.cjc.base.framework.network.providers.contracts.NetworkRequestDelegate;
@@ -22,12 +25,13 @@ import nz.co.cjc.base.framework.utils.StringUtils;
 
 /**
  * Created by Chris Cooper on 5/05/16.
- * <p/>
+ * <p>
  * Implementation of the categories and listings provider
  */
 public class DefaultCategoriesAndListingsProvider implements CategoriesAndListingsProvider {
 
     private static final String SUBCATEGORIES = "Subcategories";
+    private static final String LIST = "List";
 
     private final NetworkRequestProvider mNetworkRequestProvider;
     private final StringsProvider mStringsProvider;
@@ -42,7 +46,7 @@ public class DefaultCategoriesAndListingsProvider implements CategoriesAndListin
     }
 
     @Override
-    public void getCategoriesData(@NonNull String categoryNumber, @NonNull final CategoriesRequestDelegate requestDelegate) {
+    public void getCategoriesData(@Nullable String categoryNumber, @NonNull final CategoriesRequestDelegate requestDelegate) {
 
         if (StringUtils.isEmpty(categoryNumber)) {
             categoryNumber = "0";
@@ -50,7 +54,7 @@ public class DefaultCategoriesAndListingsProvider implements CategoriesAndListin
         String url = mNetworkRequestProvider.getBaseUrl()
                 + mStringsProvider.get(R.string.categories_url)
                 + categoryNumber
-                + mStringsProvider.get(R.string.http_request_file_format);
+                + mNetworkRequestProvider.getFileFormat();
 
         NetworkRequestProperties networkRequestProperties = NetworkRequestProperties.create().url(url).respondOnMainThread(false);
 
@@ -89,6 +93,71 @@ public class DefaultCategoriesAndListingsProvider implements CategoriesAndListin
         });
     }
 
+    @Override
+    public void getListingsData(@Nullable String categoryNumber, @NonNull final ListingsRequestDelegate requestDelegate) {
+
+        if (StringUtils.isEmpty(categoryNumber)) {
+            categoryNumber = "0";
+        }
+        String url = mNetworkRequestProvider.getBaseUrl()
+                + mStringsProvider.get(R.string.listings_url)
+                + mNetworkRequestProvider.getFileFormat()
+                + new Uri.Builder().appendQueryParameter("category", categoryNumber).build().toString();
+
+
+        NetworkRequestProperties networkRequestProperties = NetworkRequestProperties.create().url(url).respondOnMainThread(false);
+
+        mNetworkRequestProvider.startRequest(networkRequestProperties, new NetworkRequestDelegate() {
+            @Override
+            public void onRequestComplete(int statusCode, @NonNull String response) {
+                final List<ListingData> result = parseListings(response);
+
+                if (result == null) {
+                    mThreadUtilsProvider.runOnMainThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            requestDelegate.requestFailed();
+                        }
+                    });
+                    return;
+                }
+
+                mThreadUtilsProvider.runOnMainThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        requestDelegate.requestSuccess(result);
+                    }
+                });
+            }
+
+            @Override
+            public void onRequestFailed(int statusCode, @NonNull String response) {
+                requestDelegate.requestFailed();
+            }
+
+            @Override
+            public void onConnectionFailed() {
+                requestDelegate.requestFailed();
+            }
+        });
+    }
+
+    private List<ListingData> parseListings(String input) {
+        if (StringUtils.isEmpty(input)) {
+            return null;
+        }
+
+        try {
+            JsonObject rootObject = new JsonParser().parse(input).getAsJsonObject();
+            JsonArray listings = rootObject.getAsJsonArray(LIST);
+
+            return new Gson().fromJson(listings, new TypeToken<List<ListingData>>() {
+            }.getType());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
     private List<CategoryData> parseCategories(String input) {
         if (StringUtils.isEmpty(input)) {

@@ -9,12 +9,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
+import java.util.List;
+
 import javax.inject.Inject;
 
-import butterknife.BindView;
 import butterknife.ButterKnife;
 import nz.co.cjc.base.R;
 import nz.co.cjc.base.features.categoriesandlistings.logic.ListingsViewLogic;
+import nz.co.cjc.base.features.categoriesandlistings.models.ListingData;
 import nz.co.cjc.base.framework.application.MainApp;
 
 /**
@@ -24,7 +26,7 @@ import nz.co.cjc.base.framework.application.MainApp;
  */
 public class ListingsFragment extends Fragment {
 
-    @BindView(R.id.list_view) ListView mListView;
+    private ListView mListView;
 
     @Inject
     ListingsViewLogic mViewLogic;
@@ -45,9 +47,23 @@ public class ListingsFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.listings_fragment, container, false);
-        ButterKnife.bind(this, view);
-        return view;
+        return inflater.inflate(R.layout.listings_fragment, container, false);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (mViewLogic != null) {
+            mViewLogic.screenResumed();
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (mViewLogic != null) {
+            mViewLogic.screenPaused();
+        }
     }
 
     @Override
@@ -67,11 +83,15 @@ public class ListingsFragment extends Fragment {
     }
 
     private void initUI(View view) {
-        ButterKnife.bind(this, view);
+        mListView = ButterKnife.findById(view, R.id.list_view);
     }
 
     private ListingsViewLogic.ViewLogicDelegate mViewLogicDelegate = new ListingsViewLogic.ViewLogicDelegate() {
 
+        @Override
+        public void populateScreen(@NonNull List<ListingData> listings) {
+
+        }
     };
 
 }
