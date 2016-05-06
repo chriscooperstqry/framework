@@ -47,7 +47,6 @@ public class CategoriesViewLogic extends BaseViewLogic<CategoriesViewLogic.ViewL
         setDelegate(delegate);
 
         mCategoryItems = new ArrayList<>();
-
         ArrayList<CategoryData> bundleSubcategories = arguments.getParcelableArrayList(SUBCATEGORIES);
 
         if (bundleSubcategories != null) {
@@ -76,11 +75,10 @@ public class CategoriesViewLogic extends BaseViewLogic<CategoriesViewLogic.ViewL
         CategoryData item = mCategoryItems.get(position);
         Bundle bundle = new Bundle();
 
-        if (!item.getSubCategories().isEmpty()) {
-            bundle.putString(CATEGORY_NUMBER, item.getNumber());
-            bundle.putParcelableArrayList(SUBCATEGORIES, (ArrayList<? extends Parcelable>) item.getSubCategories());
-            mEventBusProvider.postEvent(new CategoryEvent(null, CategoryEvent.EventType.CategorySelected, bundle));
-        }
+        bundle.putString(CATEGORY_NUMBER, item.getNumber());
+        bundle.putParcelableArrayList(SUBCATEGORIES, (ArrayList<? extends Parcelable>) item.getSubCategories());
+        mEventBusProvider.postEvent(new CategoryEvent(null, CategoryEvent.EventType.CategorySelected, bundle));
+        mDelegate.setSelectedItem(position);
     }
 
     public void screenResumed() {
@@ -95,5 +93,11 @@ public class CategoriesViewLogic extends BaseViewLogic<CategoriesViewLogic.ViewL
          * @param categories to present
          */
         void populateScreen(@NonNull List<CategoryData> categories);
+
+        /**
+         * Remember the users selection so we can highlight it
+         * @param position in the adapter
+         */
+        void setSelectedItem(int position);
     }
 }

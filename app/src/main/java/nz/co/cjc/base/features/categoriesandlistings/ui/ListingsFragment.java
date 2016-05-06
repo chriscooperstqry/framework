@@ -27,6 +27,7 @@ import nz.co.cjc.base.framework.application.MainApp;
 public class ListingsFragment extends Fragment {
 
     private ListView mListView;
+    private ListingsAdapter mAdapter;
 
     @Inject
     ListingsViewLogic mViewLogic;
@@ -84,13 +85,16 @@ public class ListingsFragment extends Fragment {
 
     private void initUI(View view) {
         mListView = ButterKnife.findById(view, R.id.list_view);
+        mAdapter = new ListingsAdapter();
+
+        mListView.setAdapter(mAdapter);
     }
 
     private ListingsViewLogic.ViewLogicDelegate mViewLogicDelegate = new ListingsViewLogic.ViewLogicDelegate() {
 
         @Override
         public void populateScreen(@NonNull List<ListingData> listings) {
-
+            mAdapter.setListingItems(listings);
         }
     };
 

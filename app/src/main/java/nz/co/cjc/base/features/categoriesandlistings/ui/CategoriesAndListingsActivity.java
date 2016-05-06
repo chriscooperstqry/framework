@@ -97,5 +97,10 @@ public class CategoriesAndListingsActivity extends CoreActivity {
                 mSlidingPanelLayout.setScrollableView(fragment.getListView());
             }
         }
+
+        @Override
+        public void closeSlidingPanel() {
+            mSlidingPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+        }
     };
 }

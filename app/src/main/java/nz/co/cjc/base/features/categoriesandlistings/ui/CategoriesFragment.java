@@ -118,6 +118,11 @@ public class CategoriesFragment extends Fragment {
         public void populateScreen(@NonNull List<CategoryData> categories) {
             mAdapter.setCategoryItems(categories);
         }
+
+        @Override
+        public void setSelectedItem(int position) {
+            mAdapter.setSelectedItem(position);
+        }
     };
 
 }

@@ -7,5 +7,5 @@
     <item name="sliding_panel_anchor_point" format="float" type="dimen">1</item>
 
     <!-- Colors-->
-    <color name="sliding_panel_fade_color">@android:color/transparent</color>
+    <color name="sliding_panel_fade_color">#80000000</color>
 </resources>

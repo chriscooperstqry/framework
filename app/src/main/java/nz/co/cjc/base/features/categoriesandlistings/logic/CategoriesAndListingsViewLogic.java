@@ -7,10 +7,13 @@ import android.support.v4.app.Fragment;
 
 import org.greenrobot.eventbus.Subscribe;
 
+import java.util.ArrayList;
+
 import javax.inject.Inject;
 
 import nz.co.cjc.base.R;
 import nz.co.cjc.base.features.categoriesandlistings.events.CategoryEvent;
+import nz.co.cjc.base.features.categoriesandlistings.models.CategoryData;
 import nz.co.cjc.base.features.categoriesandlistings.ui.CategoriesFragment;
 import nz.co.cjc.base.features.categoriesandlistings.ui.ListingsFragment;
 import nz.co.cjc.base.framework.core.logic.BaseViewLogic;
@@ -40,11 +43,8 @@ public class CategoriesAndListingsViewLogic extends BaseViewLogic<CategoriesAndL
         CategoriesFragment categoriesFragment = CategoriesFragment.newInstance(new Bundle());
         mDelegate.presentFragment(categoriesFragment, R.id.categories_container, false);
 
-        //TODO change as this always true now with new setup
-        if (mDelegate.isListingsContainerAvailable()) {
-            Fragment listingsFragment = ListingsFragment.newInstance();
-            mDelegate.presentFragment(listingsFragment, R.id.listings_container, false);
-        }
+        Fragment listingsFragment = ListingsFragment.newInstance();
+        mDelegate.presentFragment(listingsFragment, R.id.listings_container, false);
 
     }
 
@@ -61,8 +61,14 @@ public class CategoriesAndListingsViewLogic extends BaseViewLogic<CategoriesAndL
     public void onEvent(@NonNull CategoryEvent event) {
         switch (event.getEventType()) {
             case CategorySelected:
-                Fragment categoriesFragment = CategoriesFragment.newInstance(event.getBundle());
-                mDelegate.presentFragment(categoriesFragment, R.id.categories_container, true);
+
+                ArrayList<CategoryData> subcategories = event.getBundle().getParcelableArrayList(CategoriesViewLogic.SUBCATEGORIES);
+                if (subcategories != null && !subcategories.isEmpty()) {
+                    Fragment categoriesFragment = CategoriesFragment.newInstance(event.getBundle());
+                    mDelegate.presentFragment(categoriesFragment, R.id.categories_container, true);
+                } else {
+                    mDelegate.closeSlidingPanel();
+                }
                 break;
             case CategoryLayoutReady:
                 mDelegate.setSlidingPanelScrollableView();
@@ -81,6 +87,7 @@ public class CategoriesAndListingsViewLogic extends BaseViewLogic<CategoriesAndL
     }
 
     public void onBackPressed() {
+        mEventBusProvider.postEvent(new CategoryEvent(null, CategoryEvent.EventType.OnBackPress, null));
         mDelegate.setSlidingPanelScrollableView();
     }
 
@@ -108,5 +115,10 @@ public class CategoriesAndListingsViewLogic extends BaseViewLogic<CategoriesAndL
          * current fragments list view
          */
         void setSlidingPanelScrollableView();
+
+        /**
+         * Close the sliding panel so it is hidden
+         */
+        void closeSlidingPanel();
     }
 }

@@ -94,7 +94,11 @@ public class ListingsViewLogic extends BaseViewLogic<ListingsViewLogic.ViewLogic
     }
 
     public interface ViewLogicDelegate {
-
+        /**
+         * Populate the given list of listings to the user
+         *
+         * @param listings to present
+         */
         void populateScreen(@NonNull List<ListingData> listings);
     }
 }

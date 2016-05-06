@@ -24,9 +24,8 @@
         <!-- MAIN CONTENT -->
         <FrameLayout
             android:id="@+id/listings_container"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="70"
             android:background="#00cc11"
             android:visibility="visible"/>
 
