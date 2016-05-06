@@ -14,6 +14,7 @@ import nz.co.cjc.base.framework.application.MainApp;
 import nz.co.cjc.base.framework.buildconfig.dagger.DaggerModuleBuildConfig;
 import nz.co.cjc.base.framework.dagger.modules.DaggerModuleLibrary;
 import nz.co.cjc.base.framework.eventbus.dagger.DaggerModuleEventBus;
+import nz.co.cjc.base.framework.eventbus.providers.contracts.EventBusProvider;
 import nz.co.cjc.base.framework.logging.dagger.DaggerModuleLogging;
 import nz.co.cjc.base.framework.logging.providers.contracts.LoggingProvider;
 import nz.co.cjc.base.framework.network.dagger.DaggerModuleNetwork;
@@ -69,6 +70,13 @@ public interface LibraryComponent {
      * @return resolved strings provider
      */
     StringsProvider getStringsProvider();
+
+    /**
+     * Resolve the event bus provider
+     *
+     * @return resolved event bus provider
+     */
+    EventBusProvider getEventBusProvider();
     //end region
 
     //region injection

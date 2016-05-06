@@ -17,7 +17,8 @@ public class CategoryEvent extends EventBusEvent {
     private final EventType mEventType;
 
     public enum EventType {
-        CategorySelected
+        CategorySelected,
+        CategoryLayoutReady
     }
 
     /**

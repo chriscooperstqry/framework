@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ListView;
 
 import java.util.List;
 
@@ -20,16 +21,15 @@ import nz.co.cjc.base.features.categoriesandlistings.logic.CategoriesViewLogic;
 import nz.co.cjc.base.features.categoriesandlistings.models.CategoryData;
 import nz.co.cjc.base.framework.application.MainApp;
 import nz.co.cjc.base.framework.constants.AppConstants;
-import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 
 /**
  * Created by Chris Cooper on 4/05/16.
- * <p/>
+ * <p>
  * Fragment to display the categories received from the api
  */
 public class CategoriesFragment extends Fragment {
 
-    private StickyListHeadersListView mListView;
+    private ListView mListView;
     private CategoriesAdapter mAdapter;
 
     @Inject
@@ -50,6 +50,15 @@ public class CategoriesFragment extends Fragment {
         initUI(view);
         MainApp.getDagger().inject(this);
         mViewLogic.initViewLogic(mViewLogicDelegate, getArguments());
+
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (mViewLogic != null) {
+            mViewLogic.screenResumed();
+        }
     }
 
     @Override
@@ -71,6 +80,11 @@ public class CategoriesFragment extends Fragment {
             mViewLogic.disconnect();
             mViewLogic = null;
         }
+    }
+
+    @Nullable
+    public ListView getListView() {
+        return mListView;
     }
     //end region
 
@@ -94,6 +108,7 @@ public class CategoriesFragment extends Fragment {
 
             }
         });
+
     }
     //end region
 

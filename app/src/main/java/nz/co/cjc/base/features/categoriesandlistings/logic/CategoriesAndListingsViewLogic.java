@@ -37,13 +37,15 @@ public class CategoriesAndListingsViewLogic extends BaseViewLogic<CategoriesAndL
     public void initViewLogic(@Nullable ViewLogicDelegate delegate) {
         setDelegate(delegate);
 
-        Fragment categoriesFragment = CategoriesFragment.newInstance(new Bundle());
+        CategoriesFragment categoriesFragment = CategoriesFragment.newInstance(new Bundle());
         mDelegate.presentFragment(categoriesFragment, R.id.categories_container, false);
 
+        //TODO change as this always true now with new setup
         if (mDelegate.isListingsContainerAvailable()) {
             Fragment listingsFragment = ListingsFragment.newInstance();
             mDelegate.presentFragment(listingsFragment, R.id.listings_container, false);
         }
+
     }
 
     public void screenResumed() {
@@ -61,6 +63,9 @@ public class CategoriesAndListingsViewLogic extends BaseViewLogic<CategoriesAndL
             case CategorySelected:
                 Fragment categoriesFragment = CategoriesFragment.newInstance(event.getBundle());
                 mDelegate.presentFragment(categoriesFragment, R.id.categories_container, true);
+                break;
+            case CategoryLayoutReady:
+                mDelegate.setSlidingPanelScrollableView();
                 break;
         }
     }
@@ -93,5 +98,7 @@ public class CategoriesAndListingsViewLogic extends BaseViewLogic<CategoriesAndL
          * @return True if so, false otherwise
          */
         boolean isListingsContainerAvailable();
+
+        void setSlidingPanelScrollableView();
     }
 }

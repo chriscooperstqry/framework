@@ -7,6 +7,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.widget.FrameLayout;
 
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
+
 import butterknife.ButterKnife;
 import nz.co.cjc.base.R;
 import nz.co.cjc.base.features.categoriesandlistings.logic.CategoriesAndListingsViewLogic;
@@ -15,7 +17,7 @@ import nz.co.cjc.base.framework.application.MainApp;
 
 /**
  * Created by Chris Cooper on 4/05/16.
- * <p/>
+ * <p>
  * Activity to let the user browse the categories and potentially the listings also
  * if the user is using a tablet
  */
@@ -23,6 +25,7 @@ public class CategoriesAndListingsActivity extends CoreActivity {
 
     private FrameLayout mCategoriesContainer;
     private FrameLayout mListingsContainer;
+    private SlidingUpPanelLayout mSlidingPanelLayout;
 
     private CategoriesAndListingsViewLogic mViewLogic;
 
@@ -55,7 +58,7 @@ public class CategoriesAndListingsActivity extends CoreActivity {
         setContentView(R.layout.categories_and_listings_activity);
         mCategoriesContainer = ButterKnife.findById(this, R.id.categories_container);
         mListingsContainer = ButterKnife.findById(this, R.id.listings_container);
-
+        mSlidingPanelLayout = ButterKnife.findById(this, R.id.sliding_layout);
     }
 
     private CategoriesAndListingsViewLogic.ViewLogicDelegate mViewLogicDelegate = new CategoriesAndListingsViewLogic.ViewLogicDelegate() {
@@ -75,6 +78,15 @@ public class CategoriesAndListingsActivity extends CoreActivity {
         @Override
         public boolean isListingsContainerAvailable() {
             return mListingsContainer != null;
+        }
+
+        @Override
+        public void setSlidingPanelScrollableView() {
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            CategoriesFragment fragment = (CategoriesFragment) fragmentManager.findFragmentById(R.id.categories_container);
+            if (fragment != null && fragment.getListView() != null) {
+                mSlidingPanelLayout.setScrollableView(fragment.getListView());
+            }
         }
     };
 }

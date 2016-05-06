@@ -6,10 +6,53 @@
     android:layout_height="match_parent"
     android:orientation="horizontal">
 
-    <FrameLayout
-        android:id="@+id/categories_container"
+    <com.sothree.slidinguppanel.SlidingUpPanelLayout
+        android:id="@+id/sliding_layout"
+        xmlns:sothree="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
-        android:background="#0000cc"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:gravity="bottom"
+        sothree:umanoAnchorPoint="@dimen/sliding_panel_anchor_point"
+        sothree:umanoDragView="@+id/dragView"
+        sothree:umanoFadeColor="@color/sliding_panel_fade_color"
+        sothree:umanoInitialState="anchored"
+        sothree:umanoOverlay="true"
+        sothree:umanoPanelHeight="@dimen/sliding_panel_tag_height"
+        sothree:umanoParallaxOffset="0dp"
+        sothree:umanoShadowHeight="4dp">
+
+        <!-- MAIN CONTENT -->
+        <FrameLayout
+            android:id="@+id/listings_container"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="70"
+            android:background="#00cc11"
+            android:visibility="visible"/>
+
+        <!-- SLIDING LAYOUT -->
+        <RelativeLayout
+            android:id="@+id/dragView"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/sliding_panel_content_height"
+            android:clickable="true"
+            android:focusable="false"
+            android:orientation="vertical">
+
+            <View
+                android:id="@+id/tag"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/sliding_panel_tag_height"
+                android:background="#c03"/>
+
+            <FrameLayout
+                android:id="@+id/categories_container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@+id/tag"
+                android:background="#0000cc"/>
+
+        </RelativeLayout>
+    </com.sothree.slidinguppanel.SlidingUpPanelLayout>
 
 </LinearLayout>

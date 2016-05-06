@@ -20,7 +20,7 @@ import nz.co.cjc.base.framework.strings.providers.contracts.StringsProvider;
 
 /**
  * Created by Chris Cooper on 4/05/16.
- * <p/>
+ * <p>
  * View logic for the categories fragment
  */
 public class CategoriesViewLogic extends BaseViewLogic<CategoriesViewLogic.ViewLogicDelegate> {
@@ -79,6 +79,10 @@ public class CategoriesViewLogic extends BaseViewLogic<CategoriesViewLogic.ViewL
             bundle.putParcelableArrayList(SUBCATEGORIES, (ArrayList<? extends Parcelable>) item.getSubCategories());
             mEventBusProvider.postEvent(new CategoryEvent(null, CategoryEvent.EventType.CategorySelected, bundle));
         }
+    }
+
+    public void screenResumed() {
+        mEventBusProvider.postEvent(new CategoryEvent(null, CategoryEvent.EventType.CategoryLayoutReady, null));
     }
 
     public interface ViewLogicDelegate {
