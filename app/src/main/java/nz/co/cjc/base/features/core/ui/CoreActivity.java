@@ -10,7 +10,7 @@ import nz.co.cjc.base.framework.application.MainApp;
 
 /**
  * Created by Chris Cooper on 4/05/16.
- * <p/>
+ * <p>
  * Base activity class that all others will extend for common use
  */
 public class CoreActivity extends AppCompatActivity {
@@ -27,10 +27,12 @@ public class CoreActivity extends AppCompatActivity {
         mViewLogic = MainApp.getDagger().createCoreViewLogic();
         mViewLogic.initViewLogic(mViewLogicDelegate);
 
-        // Always cast your custom Toolbar here, and set it as the ActionBar.
+
+    }
+
+    public void setupToolbar() {
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
-
     }
 
     private CoreViewLogic.ViewLogicDelegate mViewLogicDelegate = new CoreViewLogic.ViewLogicDelegate() {

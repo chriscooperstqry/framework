@@ -76,6 +76,8 @@ public class CategoriesAndListingsViewLogic extends BaseViewLogic<CategoriesAndL
                     throw new IllegalArgumentException("Must provide category data");
                 }
 
+                addToolbarText(categoryData.getName());
+
                 List<CategoryData> subcategories = categoryData.getSubCategories();
                 String categoryNumber = categoryData.getNumber();
 
@@ -127,12 +129,24 @@ public class CategoriesAndListingsViewLogic extends BaseViewLogic<CategoriesAndL
         mListingsStackProvider.removeListing();
 
         if (!mListingsStackProvider.isListingsEmpty()) {
+            removeToolbarText();
             mEventBusProvider.postEvent(new ListingsEvent(null, ListingsEvent.EventType.UpdateListings, mListingsStackProvider.getTopListing().getNumber()));
         }
 
         mDelegate.setSlidingPanelScrollableView();
 
         return bubbleUp;
+    }
+
+    private void addToolbarText(String text) {
+        String current = mDelegate.getToolbarTitle();
+        mDelegate.updateToolbarText(current + " > " + text);
+    }
+
+    private void removeToolbarText() {
+        String current = mDelegate.getToolbarTitle();
+        current = current.substring(0, current.lastIndexOf(" > "));
+        mDelegate.updateToolbarText(current);
     }
 
     public interface ViewLogicDelegate {
@@ -165,5 +179,19 @@ public class CategoriesAndListingsViewLogic extends BaseViewLogic<CategoriesAndL
          */
         void closeSlidingPanel();
 
+        /**
+         * Set the toolbar text
+         *
+         * @param text to set
+         */
+        void updateToolbarText(@NonNull String text);
+
+        /**
+         * Get the toolbars current text
+         *
+         * @return The text
+         */
+        @NonNull
+        String getToolbarTitle();
     }
 }

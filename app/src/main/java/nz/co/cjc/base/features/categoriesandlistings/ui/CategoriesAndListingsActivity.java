@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
@@ -69,6 +70,7 @@ public class CategoriesAndListingsActivity extends CoreActivity {
 
     private void initUI() {
         setContentView(R.layout.categories_and_listings_activity);
+        setupToolbar();
         mCategoriesContainer = ButterKnife.findById(this, R.id.categories_container);
         mListingsContainer = ButterKnife.findById(this, R.id.listings_container);
         mSlidingPanelLayout = ButterKnife.findById(this, R.id.sliding_layout);
@@ -110,6 +112,19 @@ public class CategoriesAndListingsActivity extends CoreActivity {
             if (mSlidingPanelLayout != null) {
                 mSlidingPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
             }
+        }
+
+        @Override
+        public void updateToolbarText(@NonNull String text) {
+            TextView title = ButterKnife.findById(mToolbar, R.id.toolbar_title);
+            title.setText(text);
+        }
+
+        @Override
+        @NonNull
+        public String getToolbarTitle() {
+            TextView title = ButterKnife.findById(mToolbar, R.id.toolbar_title);
+            return title.getText().toString();
         }
 
     };
