@@ -87,6 +87,9 @@ public class CategoriesAndListingsViewLogicTest {
     ArgumentCaptor<ListingsEvent> mListingsEventCaptor;
 
     @Captor
+    ArgumentCaptor<CategoryEvent> mCategoryEventCaptor;
+
+    @Captor
     ArgumentCaptor<CategoryData> mCategoryDataCaptor;
 
     @Captor
@@ -216,7 +219,7 @@ public class CategoriesAndListingsViewLogicTest {
     }
 
     @Test
-    public void testOnEventCategorySelectedWithSubCategories() {
+    public void testOnEventCategorySelectedWithSubcategories() {
 
         //Setup
         Bundle bundle = new Bundle();
@@ -236,6 +239,7 @@ public class CategoriesAndListingsViewLogicTest {
         verify(mListingsStackProvider).addListing(categoryData);
         verify(mEventBusProvider).postEvent(mListingsEventCaptor.capture());
         verify(mDelegate).presentFragment(mFragmentCaptor.capture(), mIntegerCaptor.capture(), mBooleanCaptor.capture());
+        verify(mDelegate, never()).closeSlidingPanel();
 
         assertThat(mListingsEventCaptor.getValue().getEventType(), is(ListingsEvent.EventType.UpdateListings));
         assertThat(mListingsEventCaptor.getValue().getCategoryNumber(), is("0001-0348-1261-"));
@@ -245,11 +249,174 @@ public class CategoriesAndListingsViewLogicTest {
         assertThat(mBooleanCaptor.getValue(), is(true));
     }
 
+    @Test
+    public void testOnEventCategorySelectedWithNoSubcategories() {
+
+        //Setup
+        Bundle bundleWithSubcategories = new Bundle();
+        CategoryData categoryDataWithSubcategories = generateCategoryDataWithSubcategories().get(0);
+        bundleWithSubcategories.putParcelable(CategoriesViewLogic.CATEGORY_DATA, categoryDataWithSubcategories);
+        CategoryEvent categoryEventWithSubcategories = new CategoryEvent(null, CategoryEvent.EventType.CategorySelected, bundleWithSubcategories);
+
+        Bundle bundleWithNoSubcategories = new Bundle();
+        CategoryData categoryDataWithNoSubcategories = generateCategoryDataWithNoSubcategories().get(0);
+        bundleWithNoSubcategories.putParcelable(CategoriesViewLogic.CATEGORY_DATA, categoryDataWithNoSubcategories);
+        CategoryEvent categoryEventWithNoSubcategories = new CategoryEvent(null, CategoryEvent.EventType.CategorySelected, bundleWithNoSubcategories);
+
+        when(mListingsStackProvider.getTopListing()).thenReturn(categoryDataWithSubcategories);
+
+        //Run
+        mViewLogic.initViewLogic(mDelegate, null);
+        mViewLogic.onEvent(categoryEventWithSubcategories);
+        reset(mDelegate, mEventBusProvider);
+        when(mDelegate.getToolbarTitle()).thenReturn("Title");
+        mViewLogic.onEvent(categoryEventWithNoSubcategories);
+
+
+        //Verify
+        verify(mDelegate).getToolbarTitle();
+        verify(mDelegate).updateToolbarText("Title > Kawasaki");
+        verify(mListingsStackProvider).addListing(categoryDataWithNoSubcategories);
+        verify(mEventBusProvider).postEvent(mListingsEventCaptor.capture());
+        verify(mDelegate, never()).presentFragment(any(Fragment.class), anyInt(), anyBoolean());
+        verify(mDelegate).closeSlidingPanel();
+
+        assertThat(mListingsEventCaptor.getValue().getEventType(), is(ListingsEvent.EventType.UpdateListings));
+        assertThat(mListingsEventCaptor.getValue().getCategoryNumber(), is("0001-0348-2948-8556-"));
+
+    }
+
+    @Test
+    public void testOnEventCategorySelectedWithNoSubcategoriesTwice() {
+
+        //Setup
+        Bundle bundleWithSubcategories = new Bundle();
+        CategoryData categoryDataWithSubcategories = generateCategoryDataWithSubcategories().get(0);
+        bundleWithSubcategories.putParcelable(CategoriesViewLogic.CATEGORY_DATA, categoryDataWithSubcategories);
+        CategoryEvent categoryEventWithSubcategories = new CategoryEvent(null, CategoryEvent.EventType.CategorySelected, bundleWithSubcategories);
+
+        Bundle bundleWithNoSubcategories = new Bundle();
+        CategoryData categoryDataWithNoSubcategories = generateCategoryDataWithNoSubcategories().get(0);
+        bundleWithNoSubcategories.putParcelable(CategoriesViewLogic.CATEGORY_DATA, categoryDataWithNoSubcategories);
+        CategoryEvent categoryEventWithNoSubcategories = new CategoryEvent(null, CategoryEvent.EventType.CategorySelected, bundleWithNoSubcategories);
+
+        when(mListingsStackProvider.getTopListing()).thenReturn(categoryDataWithSubcategories);
+        when(mListingsStackProvider.isEndOfSubcategory()).thenReturn(true);
+        when(mListingsStackProvider.size()).thenReturn(2);
+
+        //Run
+        mViewLogic.initViewLogic(mDelegate, null);
+        mViewLogic.onEvent(categoryEventWithSubcategories);
+        reset(mDelegate, mEventBusProvider);
+        when(mDelegate.getToolbarTitle()).thenReturn("Title > Boats");
+        mViewLogic.onEvent(categoryEventWithNoSubcategories);
+
+        //Verify
+        verify(mDelegate, times(2)).getToolbarTitle();
+        verify(mDelegate).updateToolbarText("Title > Boats > Kawasaki");
+        verify(mListingsStackProvider).removeListing();
+        verify(mListingsStackProvider).addListing(categoryDataWithNoSubcategories);
+        verify(mEventBusProvider).postEvent(mListingsEventCaptor.capture());
+        verify(mDelegate, never()).presentFragment(any(Fragment.class), anyInt(), anyBoolean());
+        verify(mDelegate).closeSlidingPanel();
+
+        assertThat(mListingsEventCaptor.getValue().getEventType(), is(ListingsEvent.EventType.UpdateListings));
+        assertThat(mListingsEventCaptor.getValue().getCategoryNumber(), is("0001-0348-2948-8556-"));
+
+    }
+
+    @Test
+    public void testOnEventCategoryLayoutReady() {
+
+        //Setup
+        CategoryEvent categoryEvent = new CategoryEvent(null, CategoryEvent.EventType.CategoryLayoutReady, new Bundle());
+
+        //Run
+        mViewLogic.initViewLogic(mDelegate, null);
+        mViewLogic.onEvent(categoryEvent);
+
+        //Verify
+        verify(mDelegate).setSlidingPanelScrollableView();
+    }
+
+    @Test
+    public void testOnBackPressedEndOfSubcategory() {
+
+        //Setup
+        when(mListingsStackProvider.isEndOfSubcategory()).thenReturn(true);
+        when(mListingsStackProvider.size()).thenReturn(2);
+        when(mListingsStackProvider.isListingsEmpty()).thenReturn(true);
+        //Run
+        mViewLogic.initViewLogic(mDelegate, null);
+        boolean result = mViewLogic.onBackPressed();
+
+        //Verify
+        verify(mEventBusProvider).postEvent(mCategoryEventCaptor.capture());
+        assertThat(mCategoryEventCaptor.getValue().getEventType(), is(CategoryEvent.EventType.ClearCategorySelection));
+        assertThat(result, is(false));
+    }
+
+    @Test
+    public void testOnBackPressedRemoveListing() {
+
+        //Setup
+        when(mListingsStackProvider.isListingsEmpty()).thenReturn(true);
+
+        //Run
+        mViewLogic.initViewLogic(mDelegate, null);
+        mViewLogic.onBackPressed();
+
+        //Verify
+        verify(mListingsStackProvider).removeListing();
+    }
+
+    @Test
+    public void testOnBackPressedUpdateToolbarAndListings() {
+
+        //Setup
+        CategoryData categoryDataWithSubcategories = generateCategoryDataWithSubcategories().get(0);
+        when(mListingsStackProvider.getTopListing()).thenReturn(categoryDataWithSubcategories);
+        when(mListingsStackProvider.isListingsEmpty()).thenReturn(false);
+        when(mDelegate.getToolbarTitle()).thenReturn("Title > Books");
+
+        //Run
+        mViewLogic.initViewLogic(mDelegate, null);
+        mViewLogic.onBackPressed();
+
+        //Verify
+        verify(mEventBusProvider).postEvent(mListingsEventCaptor.capture());
+        verify(mDelegate).setSlidingPanelScrollableView();
+        verify(mDelegate).updateToolbarText("Title");
+
+        assertThat(mListingsEventCaptor.getValue().getEventType(), is(ListingsEvent.EventType.UpdateListings));
+        assertThat(mListingsEventCaptor.getValue().getCategoryNumber(), is("0001-0348-1261-"));
+    }
+
+    @Test
+    public void testOnBackPressedSetSlidingPanelView() {
+
+        //Setup
+        when(mListingsStackProvider.isListingsEmpty()).thenReturn(true);
+
+        //Run
+        mViewLogic.initViewLogic(mDelegate, null);
+        mViewLogic.onBackPressed();
+
+        //Verify
+        verify(mDelegate).setSlidingPanelScrollableView();
+    }
+
+    private List<CategoryData> generateCategoryDataWithNoSubcategories() {
+        return parseJson(SAMPLE_CATEGORY_DATA_WITH_NO_SUBCATEGORIES);
+    }
 
     private List<CategoryData> generateCategoryDataWithSubcategories() {
+        return parseJson(SAMPLE_CATEGORY_DATA_WITH_SUBCATEGORIES);
+    }
 
+    private List<CategoryData> parseJson(String input) {
         try {
-            JsonObject rootObject = new JsonParser().parse(SAMPLE_CATEGORY_DATA_WITH_SUB_CATEGORIES).getAsJsonObject();
+            JsonObject rootObject = new JsonParser().parse(input).getAsJsonObject();
             JsonArray subcategories = rootObject.getAsJsonArray(CategoriesAndListingsProvider.SUBCATEGORIES);
 
             return new Gson().fromJson(subcategories, new TypeToken<List<CategoryData>>() {
@@ -260,7 +427,50 @@ public class CategoriesAndListingsViewLogicTest {
         }
     }
 
-    private static final String SAMPLE_CATEGORY_DATA_WITH_SUB_CATEGORIES = "{\n" +
+    private static final String SAMPLE_CATEGORY_DATA_WITH_NO_SUBCATEGORIES = "{\n" +
+            "  \"Name\": \"Jetskis\",\n" +
+            "  \"Number\": \"0001-0348-2948-\",\n" +
+            "  \"Path\": \"\\/Trade-Me-Motors\\/Boats-marine\\/Jetskis\",\n" +
+            "  \"Subcategories\": [\n" +
+            "    {\n" +
+            "      \"Name\": \"Kawasaki\",\n" +
+            "      \"Number\": \"0001-0348-2948-8556-\",\n" +
+            "      \"Path\": \"\\/Trade-Me-Motors\\/Boats-marine\\/Jetskis\\/Kawasaki\",\n" +
+            "      \"HasClassifieds\": true\n" +
+            "    },\n" +
+            "    {\n" +
+            "      \"Name\": \"Seadoo\",\n" +
+            "      \"Number\": \"0001-0348-2948-8554-\",\n" +
+            "      \"Path\": \"\\/Trade-Me-Motors\\/Boats-marine\\/Jetskis\\/Seadoo\",\n" +
+            "      \"HasClassifieds\": true\n" +
+            "    },\n" +
+            "    {\n" +
+            "      \"Name\": \"Yamaha\",\n" +
+            "      \"Number\": \"0001-0348-2948-8555-\",\n" +
+            "      \"Path\": \"\\/Trade-Me-Motors\\/Boats-marine\\/Jetskis\\/Yamaha\",\n" +
+            "      \"HasClassifieds\": true\n" +
+            "    },\n" +
+            "    {\n" +
+            "      \"Name\": \"Other jetskis\",\n" +
+            "      \"Number\": \"0001-0348-2948-2949-\",\n" +
+            "      \"Path\": \"\\/Trade-Me-Motors\\/Boats-marine\\/Jetskis\\/Other-jetskis\",\n" +
+            "      \"HasClassifieds\": true\n" +
+            "    },\n" +
+            "    {\n" +
+            "      \"Name\": \"Parts\",\n" +
+            "      \"Number\": \"0001-0348-2948-8553-\",\n" +
+            "      \"Path\": \"\\/Trade-Me-Motors\\/Boats-marine\\/Jetskis\\/Parts\"\n" +
+            "    },\n" +
+            "    {\n" +
+            "      \"Name\": \"Accessories\",\n" +
+            "      \"Number\": \"0001-0348-2948-2950-\",\n" +
+            "      \"Path\": \"\\/Trade-Me-Motors\\/Boats-marine\\/Jetskis\\/Accessories\"\n" +
+            "    }\n" +
+            "  ],\n" +
+            "  \"HasClassifieds\": true\n" +
+            "}";
+
+    private static final String SAMPLE_CATEGORY_DATA_WITH_SUBCATEGORIES = "{\n" +
             "  \"Name\": \"Boats & marine\",\n" +
             "  \"Number\": \"0001-0348-\",\n" +
             "  \"Path\": \"\\/Trade-Me-Motors\\/Boats-marine\",\n" +

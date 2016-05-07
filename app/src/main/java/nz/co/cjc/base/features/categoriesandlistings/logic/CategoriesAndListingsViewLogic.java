@@ -22,7 +22,6 @@ import nz.co.cjc.base.framework.core.logic.BaseViewLogic;
 import nz.co.cjc.base.framework.eventbus.providers.contracts.EventBusProvider;
 import nz.co.cjc.base.framework.eventbus.providers.contracts.EventBusSubscriber;
 import nz.co.cjc.base.framework.strings.providers.contracts.StringsProvider;
-import nz.co.cjc.base.framework.utils.StringUtils;
 
 /**
  * Created by Chris Cooper on 4/05/16.
@@ -82,11 +81,8 @@ public class CategoriesAndListingsViewLogic extends BaseViewLogic<CategoriesAndL
 
                 //If there are more other sub categories to drill into
                 if (!datasSubcategories.isEmpty()) {
-                    addToolbarText(categoryData.getName());
 
-                    mListingsStackProvider.addListing(categoryData);
-                    mEventBusProvider.postEvent(new ListingsEvent(null, ListingsEvent.EventType.UpdateListings, categoryNumber));
-
+                    updateAndNotify(categoryData, categoryNumber);
                     Fragment categoriesFragment = CategoriesFragment.newInstance(event.getBundle());
                     mDelegate.presentFragment(categoriesFragment, R.id.categories_container, true);
 
@@ -98,14 +94,12 @@ public class CategoriesAndListingsViewLogic extends BaseViewLogic<CategoriesAndL
                     //We need to remove the current viewing from the stack and title, as
                     //really we're just replacing the current top state, not adding an additional item on.
                     //Also, don't do this if we are on the root home page
-                    if (mListingsStackProvider.size() != 1 && mListingsStackProvider.getTopListing().getSubCategories().isEmpty()) {
+                    if (mListingsStackProvider.size() != 1 && mListingsStackProvider.isEndOfSubcategory()) {
                         mListingsStackProvider.removeListing();
                         removeToolbarText();
                     }
 
-                    addToolbarText(categoryData.getName());
-                    mListingsStackProvider.addListing(categoryData);
-                    mEventBusProvider.postEvent(new ListingsEvent(null, ListingsEvent.EventType.UpdateListings, categoryNumber));
+                    updateAndNotify(categoryData, categoryNumber);
                     mDelegate.closeSlidingPanel();
                 }
                 break;
@@ -137,7 +131,7 @@ public class CategoriesAndListingsViewLogic extends BaseViewLogic<CategoriesAndL
     public boolean onBackPressed() {
         boolean bubbleUp = true;
 
-        if (!StringUtils.isEmpty(mListingsStackProvider.getTopListing().getName()) && mListingsStackProvider.isEndOfSubcategory()) {
+        if (mListingsStackProvider.size() != 1 && mListingsStackProvider.isEndOfSubcategory()) {
             mEventBusProvider.postEvent(new CategoryEvent(null, CategoryEvent.EventType.ClearCategorySelection, null));
             bubbleUp = false;
         }
@@ -152,6 +146,13 @@ public class CategoriesAndListingsViewLogic extends BaseViewLogic<CategoriesAndL
         mDelegate.setSlidingPanelScrollableView();
 
         return bubbleUp;
+    }
+
+    private void updateAndNotify(CategoryData categoryData, String categoryNumber) {
+        addToolbarText(categoryData.getName());
+        mListingsStackProvider.addListing(categoryData);
+        mEventBusProvider.postEvent(new ListingsEvent(null, ListingsEvent.EventType.UpdateListings, categoryNumber));
+
     }
 
     private void addToolbarText(String text) {
