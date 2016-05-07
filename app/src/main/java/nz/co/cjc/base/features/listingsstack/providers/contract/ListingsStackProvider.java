@@ -45,4 +45,11 @@ public interface ListingsStackProvider {
      * @return True if this is the last sub category in the chain
      */
     boolean isEndOfSubcategory();
+
+    /**
+     * Get the size of the listings stack
+     *
+     * @return the size
+     */
+    int size();
 }

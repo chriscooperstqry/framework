@@ -14,6 +14,8 @@ import nz.co.cjc.base.features.categoriesandlistings.models.ListingData;
  * Provider to retrieve categories and listings data from the api
  */
 public interface CategoriesAndListingsProvider {
+    String SUBCATEGORIES = "Subcategories";
+    String LIST = "List";
 
     /**
      * Retrieve the categories from the api

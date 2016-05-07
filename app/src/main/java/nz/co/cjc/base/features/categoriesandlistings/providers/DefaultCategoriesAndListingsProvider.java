@@ -31,9 +31,6 @@ import nz.co.cjc.base.framework.utils.StringUtils;
  */
 public class DefaultCategoriesAndListingsProvider implements CategoriesAndListingsProvider {
 
-    private static final String SUBCATEGORIES = "Subcategories";
-    private static final String LIST = "List";
-
     private final NetworkRequestProvider mNetworkRequestProvider;
     private final StringsProvider mStringsProvider;
     private final ThreadUtilsProvider mThreadUtilsProvider;

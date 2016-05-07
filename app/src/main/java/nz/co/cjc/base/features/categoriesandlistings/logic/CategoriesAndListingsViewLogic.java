@@ -72,17 +72,16 @@ public class CategoriesAndListingsViewLogic extends BaseViewLogic<CategoriesAndL
         switch (event.getEventType()) {
             case CategorySelected:
 
-                CategoryData categoryData = event.getBundle().getParcelable(CategoriesViewLogic.CATEGORY_DATA);
-
-                if (categoryData == null) {
+                if (event.getBundle() == null || event.getBundle().getParcelable(CategoriesViewLogic.CATEGORY_DATA) == null) {
                     throw new IllegalArgumentException("Must provide category data");
                 }
 
-                List<CategoryData> subcategories = categoryData.getSubCategories();
+                CategoryData categoryData = event.getBundle().getParcelable(CategoriesViewLogic.CATEGORY_DATA);
+                List<CategoryData> datasSubcategories = categoryData.getSubCategories();
                 String categoryNumber = categoryData.getNumber();
 
                 //If there are more other sub categories to drill into
-                if (!subcategories.isEmpty()) {
+                if (!datasSubcategories.isEmpty()) {
                     addToolbarText(categoryData.getName());
 
                     mListingsStackProvider.addListing(categoryData);
@@ -93,12 +92,13 @@ public class CategoriesAndListingsViewLogic extends BaseViewLogic<CategoriesAndL
 
                 }
                 //If this category doesn't have any more subcategories, and we're not clicking on the same category that is already displaying
-                else if (subcategories.isEmpty() && !mListingsStackProvider.getTopListing().getNumber().equals(categoryNumber)) {
+                else if (datasSubcategories.isEmpty() && !mListingsStackProvider.getTopListing().getNumber().equals(categoryNumber)) {
 
                     //When we're clicking on a different option that is in the same list of the end category list
                     //We need to remove the current viewing from the stack and title, as
-                    //really we're just replacing the current top state, not adding an additional item on
-                    if (mListingsStackProvider.getTopListing().getSubCategories().isEmpty()) {
+                    //really we're just replacing the current top state, not adding an additional item on.
+                    //Also, don't do this if we are on the root home page
+                    if (mListingsStackProvider.size() != 1 && mListingsStackProvider.getTopListing().getSubCategories().isEmpty()) {
                         mListingsStackProvider.removeListing();
                         removeToolbarText();
                     }
