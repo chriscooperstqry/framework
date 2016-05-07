@@ -177,14 +177,6 @@ public class CategoriesAndListingsViewLogic extends BaseViewLogic<CategoriesAndL
         void presentFragment(@NonNull Fragment fragment, int fragmentContainerId, boolean addToBackStack);
 
         /**
-         * Check whether we are using the larger layout xml (we are on a tablet), to see if the listings container
-         * is available for us to insert a fragment
-         *
-         * @return True if so, false otherwise
-         */
-        boolean isListingsContainerAvailable();
-
-        /**
          * Sets the sliding panel layouts scrollable view to the
          * current fragments list view
          */

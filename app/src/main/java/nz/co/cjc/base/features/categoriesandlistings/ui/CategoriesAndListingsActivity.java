@@ -5,7 +5,6 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
@@ -24,8 +23,6 @@ import nz.co.cjc.base.framework.application.MainApp;
  */
 public class CategoriesAndListingsActivity extends CoreActivity {
 
-    private FrameLayout mCategoriesContainer;
-    private FrameLayout mListingsContainer;
     private SlidingUpPanelLayout mSlidingPanelLayout;
 
     private CategoriesAndListingsViewLogic mViewLogic;
@@ -71,8 +68,6 @@ public class CategoriesAndListingsActivity extends CoreActivity {
     private void initUI() {
         setContentView(R.layout.categories_and_listings_activity);
         setupToolbar();
-        mCategoriesContainer = ButterKnife.findById(this, R.id.categories_container);
-        mListingsContainer = ButterKnife.findById(this, R.id.listings_container);
         mSlidingPanelLayout = ButterKnife.findById(this, R.id.sliding_layout);
     }
 
@@ -91,17 +86,11 @@ public class CategoriesAndListingsActivity extends CoreActivity {
         }
 
         @Override
-        public boolean isListingsContainerAvailable() {
-            return mListingsContainer != null;
-        }
-
-        @Override
         public void setSlidingPanelScrollableView() {
             if (mSlidingPanelLayout != null) {
                 FragmentManager fragmentManager = getSupportFragmentManager();
                 CategoriesFragment fragment = (CategoriesFragment) fragmentManager.findFragmentById(R.id.categories_container);
                 if (fragment != null && fragment.getListView() != null) {
-                    MainApp.getDagger().getLoggingProvider().d("Setting scrollable view");
                     mSlidingPanelLayout.setScrollableView(fragment.getListView());
                 }
             }
