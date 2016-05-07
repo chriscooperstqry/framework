@@ -37,21 +37,17 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/sliding_panel_content_height"
             android:clickable="true"
-            android:focusable="false"
-            android:orientation="vertical">
+            android:focusable="false">
 
-            <View
+            <include
                 android:id="@+id/tag"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/sliding_panel_tag_height"
-                android:background="#c03"/>
+                layout="@layout/sliding_panel_tag"/>
 
             <FrameLayout
                 android:id="@+id/categories_container"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_below="@+id/tag"
-                android:background="#0000cc"/>
+                android:layout_below="@+id/tag"/>
 
         </RelativeLayout>
     </com.sothree.slidinguppanel.SlidingUpPanelLayout>

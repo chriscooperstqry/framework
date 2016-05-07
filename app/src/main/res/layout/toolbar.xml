@@ -9,6 +9,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
         <TextView
             android:id="@+id/toolbar_title"
             android:layout_width="wrap_content"
@@ -16,10 +17,12 @@
             android:layout_centerVertical="true"
             android:layout_gravity="center"
             android:layout_marginRight="?attr/actionBarSize"
+            android:layout_marginEnd="?attr/actionBarSize"
             android:ellipsize="start"
             android:freezesText="true"
             android:gravity="center_vertical"
             android:maxLines="1"
+            android:textSize="16sp"
             android:text="Home"
             android:textColor="@android:color/white"
             android:visibility="visible"

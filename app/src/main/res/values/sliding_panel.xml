@@ -2,10 +2,11 @@
 <resources>
 
     <!-- Dimens -->
-    <dimen name="sliding_panel_tag_height">40dp</dimen>
+    <dimen name="sliding_panel_tag_height">50dp</dimen>
     <dimen name="sliding_panel_content_height">400dp</dimen>
     <item name="sliding_panel_anchor_point" format="float" type="dimen">1</item>
 
     <!-- Colors-->
     <color name="sliding_panel_fade_color">#80000000</color>
+    <string name="sliding_panel_tag_text">Categories</string>
 </resources>
