@@ -81,7 +81,8 @@ public class CategoriesAndListingsViewLogic extends BaseViewLogic<CategoriesAndL
                 List<CategoryData> subcategories = categoryData.getSubCategories();
                 String categoryNumber = categoryData.getNumber();
 
-                if (!subcategories.isEmpty() && !mListingsStackProvider.getTopListing().getNumber().equals(categoryNumber)) {
+                //If there are more other sub categories to drill into
+                if (!subcategories.isEmpty()) {
                     addToolbarText(categoryData.getName());
 
                     mListingsStackProvider.addListing(categoryData);
@@ -90,7 +91,18 @@ public class CategoriesAndListingsViewLogic extends BaseViewLogic<CategoriesAndL
                     Fragment categoriesFragment = CategoriesFragment.newInstance(event.getBundle());
                     mDelegate.presentFragment(categoriesFragment, R.id.categories_container, true);
 
-                } else if(subcategories.isEmpty() && !mListingsStackProvider.getTopListing().getNumber().equals(categoryNumber)) {
+                }
+                //If this category doesn't have any more subcategories, and we're not clicking on the same category that is already displaying
+                else if (subcategories.isEmpty() && !mListingsStackProvider.getTopListing().getNumber().equals(categoryNumber)) {
+
+                    //When we're clicking on a different option that is in the same list of the end category list
+                    //We need to remove the current viewing from the stack and title, as
+                    //really we're just replacing the current top state, not adding an additional item on
+                    if (mListingsStackProvider.getTopListing().getSubCategories().isEmpty()) {
+                        mListingsStackProvider.removeListing();
+                        removeToolbarText();
+                    }
+
                     addToolbarText(categoryData.getName());
                     mListingsStackProvider.addListing(categoryData);
                     mEventBusProvider.postEvent(new ListingsEvent(null, ListingsEvent.EventType.UpdateListings, categoryNumber));
