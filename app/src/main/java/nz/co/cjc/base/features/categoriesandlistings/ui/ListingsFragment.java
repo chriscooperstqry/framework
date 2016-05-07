@@ -43,7 +43,7 @@ public class ListingsFragment extends Fragment {
 
         initUI(view);
         MainApp.getDagger().inject(this);
-        mViewLogic.initViewLogic(mViewLogicDelegate);
+        mViewLogic.initViewLogic(mViewLogicDelegate, savedInstanceState);
     }
 
     @Override
@@ -80,6 +80,14 @@ public class ListingsFragment extends Fragment {
         if (mViewLogic != null) {
             mViewLogic.disconnect();
             mViewLogic = null;
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (mViewLogic != null) {
+            mViewLogic.onSaveInstanceState(outState);
         }
     }
 

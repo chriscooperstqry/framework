@@ -1,5 +1,7 @@
 package nz.co.cjc.base.features.categoriesandlistings.logic;
 
+import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -17,6 +19,7 @@ import nz.co.cjc.base.framework.application.MainApp;
 import nz.co.cjc.base.framework.core.logic.BaseViewLogic;
 import nz.co.cjc.base.framework.eventbus.providers.contracts.EventBusProvider;
 import nz.co.cjc.base.framework.eventbus.providers.contracts.EventBusSubscriber;
+import nz.co.cjc.base.framework.statesaver.providers.contract.StateSaverProvider;
 import nz.co.cjc.base.framework.strings.providers.contracts.StringsProvider;
 import nz.co.cjc.base.framework.utils.StringUtils;
 
@@ -30,22 +33,30 @@ public class ListingsViewLogic extends BaseViewLogic<ListingsViewLogic.ViewLogic
     private final StringsProvider mStringsProvider;
     private final CategoriesAndListingsProvider mCategoriesAndListingsProvider;
     private final EventBusProvider mEventBusProvider;
+    private final StateSaverProvider mStateSaverProvider;
     private List<ListingData> mListingItems;
 
     @Inject
     public ListingsViewLogic(@NonNull StringsProvider stringsProvider,
                              @NonNull CategoriesAndListingsProvider categoriesAndListingsProvider,
-                             @NonNull EventBusProvider eventBusProvider) {
+                             @NonNull EventBusProvider eventBusProvider,
+                             @NonNull StateSaverProvider stateSaverProvider) {
         super(ViewLogicDelegate.class, stringsProvider);
         mStringsProvider = stringsProvider;
         mCategoriesAndListingsProvider = categoriesAndListingsProvider;
         mEventBusProvider = eventBusProvider;
+        mStateSaverProvider = stateSaverProvider;
     }
 
-    public void initViewLogic(@Nullable ViewLogicDelegate delegate) {
+    public void initViewLogic(@Nullable ViewLogicDelegate delegate, @Nullable Bundle savedInstanceState) {
         setDelegate(delegate);
 
         mListingItems = new ArrayList<>();
+
+        if(savedInstanceState!=null){
+            mListingItems = mStateSaverProvider.getParcelableArrayList(StateSaverProvider.STATE_ITEMS, savedInstanceState);
+            mDelegate.populateScreen(mListingItems);
+        }
     }
 
     private void getListings(String categoryNumber) {
@@ -96,6 +107,10 @@ public class ListingsViewLogic extends BaseViewLogic<ListingsViewLogic.ViewLogic
     @Override
     public void unsubscribeFromEventBus() {
         mEventBusProvider.unsubscribe(this);
+    }
+
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        mStateSaverProvider.saveParcelableArrayList(StateSaverProvider.STATE_ITEMS, (ArrayList<? extends Parcelable>) mListingItems, outState);
     }
 
     public interface ViewLogicDelegate {

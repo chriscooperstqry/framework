@@ -49,7 +49,7 @@ public class CategoriesFragment extends Fragment {
 
         initUI(view);
         MainApp.getDagger().inject(this);
-        mViewLogic.initViewLogic(mViewLogicDelegate, getArguments());
+        mViewLogic.initViewLogic(mViewLogicDelegate, getArguments(), savedInstanceState);
 
     }
 
@@ -64,7 +64,7 @@ public class CategoriesFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        if(mViewLogic!=null){
+        if (mViewLogic != null) {
             mViewLogic.screenPaused();
         }
     }
@@ -87,6 +87,14 @@ public class CategoriesFragment extends Fragment {
         if (mViewLogic != null) {
             mViewLogic.disconnect();
             mViewLogic = null;
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (mViewLogic != null) {
+            mViewLogic.onSaveInstanceState(outState);
         }
     }
 
@@ -131,6 +139,7 @@ public class CategoriesFragment extends Fragment {
         public void setSelectedItem(int position) {
             mAdapter.setSelectedItem(position);
         }
+
     };
 
 }

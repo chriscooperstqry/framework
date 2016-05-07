@@ -44,15 +44,17 @@ public class CategoriesAndListingsViewLogic extends BaseViewLogic<CategoriesAndL
 
     }
 
-    public void initViewLogic(@Nullable ViewLogicDelegate delegate) {
+    public void initViewLogic(@Nullable ViewLogicDelegate delegate, @Nullable Bundle savedInstanceState) {
         setDelegate(delegate);
 
-        mListingsStackProvider.addListing(new CategoryData());
-        CategoriesFragment categoriesFragment = CategoriesFragment.newInstance(new Bundle());
-        mDelegate.presentFragment(categoriesFragment, R.id.categories_container, false);
+        if (savedInstanceState == null) {
+            mListingsStackProvider.addListing(new CategoryData());
+            CategoriesFragment categoriesFragment = CategoriesFragment.newInstance(new Bundle());
+            mDelegate.presentFragment(categoriesFragment, R.id.categories_container, false);
 
-        Fragment listingsFragment = ListingsFragment.newInstance();
-        mDelegate.presentFragment(listingsFragment, R.id.listings_container, false);
+            Fragment listingsFragment = ListingsFragment.newInstance();
+            mDelegate.presentFragment(listingsFragment, R.id.listings_container, false);
+        }
 
     }
 
@@ -76,11 +78,10 @@ public class CategoriesAndListingsViewLogic extends BaseViewLogic<CategoriesAndL
                     throw new IllegalArgumentException("Must provide category data");
                 }
 
-
                 List<CategoryData> subcategories = categoryData.getSubCategories();
+                String categoryNumber = categoryData.getNumber();
 
-                if (!subcategories.isEmpty()) {
-                    String categoryNumber = categoryData.getNumber();
+                if (!subcategories.isEmpty() && !mListingsStackProvider.getTopListing().getNumber().equals(categoryNumber)) {
                     addToolbarText(categoryData.getName());
 
                     mListingsStackProvider.addListing(categoryData);
@@ -89,7 +90,10 @@ public class CategoriesAndListingsViewLogic extends BaseViewLogic<CategoriesAndL
                     Fragment categoriesFragment = CategoriesFragment.newInstance(event.getBundle());
                     mDelegate.presentFragment(categoriesFragment, R.id.categories_container, true);
 
-                } else {
+                } else if(subcategories.isEmpty() && !mListingsStackProvider.getTopListing().getNumber().equals(categoryNumber)) {
+                    addToolbarText(categoryData.getName());
+                    mListingsStackProvider.addListing(categoryData);
+                    mEventBusProvider.postEvent(new ListingsEvent(null, ListingsEvent.EventType.UpdateListings, categoryNumber));
                     mDelegate.closeSlidingPanel();
                 }
                 break;

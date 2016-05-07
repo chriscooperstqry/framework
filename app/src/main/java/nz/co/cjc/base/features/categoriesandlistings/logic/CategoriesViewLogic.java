@@ -1,6 +1,7 @@
 package nz.co.cjc.base.features.categoriesandlistings.logic;
 
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -18,6 +19,7 @@ import nz.co.cjc.base.framework.application.MainApp;
 import nz.co.cjc.base.framework.core.logic.BaseViewLogic;
 import nz.co.cjc.base.framework.eventbus.providers.contracts.EventBusProvider;
 import nz.co.cjc.base.framework.eventbus.providers.contracts.EventBusSubscriber;
+import nz.co.cjc.base.framework.statesaver.providers.contract.StateSaverProvider;
 import nz.co.cjc.base.framework.strings.providers.contracts.StringsProvider;
 
 /**
@@ -32,25 +34,34 @@ public class CategoriesViewLogic extends BaseViewLogic<CategoriesViewLogic.ViewL
     private final StringsProvider mStringsProvider;
     private final CategoriesAndListingsProvider mCategoriesAndListingsProvider;
     private final EventBusProvider mEventBusProvider;
+    private final StateSaverProvider mStateSaverProvider;
     private List<CategoryData> mCategoryItems;
 
     @Inject
     public CategoriesViewLogic(@NonNull StringsProvider stringsProvider,
                                @NonNull CategoriesAndListingsProvider categoriesAndListingsProvider,
-                               @NonNull EventBusProvider eventBusProvider) {
+                               @NonNull EventBusProvider eventBusProvider,
+                               @NonNull StateSaverProvider stateSaverProvider) {
         super(ViewLogicDelegate.class, stringsProvider);
         mStringsProvider = stringsProvider;
         mCategoriesAndListingsProvider = categoriesAndListingsProvider;
         mEventBusProvider = eventBusProvider;
+        mStateSaverProvider = stateSaverProvider;
     }
 
-    public void initViewLogic(@Nullable ViewLogicDelegate delegate, @NonNull Bundle arguments) {
+    public void initViewLogic(@Nullable ViewLogicDelegate delegate, @NonNull Bundle arguments, @Nullable Bundle savedInstanceState) {
         setDelegate(delegate);
 
-        mCategoryItems = new ArrayList<>();
         CategoryData categoryData = arguments.getParcelable(CATEGORY_DATA);
+        mCategoryItems = new ArrayList<>();
 
-        if  (categoryData != null && !categoryData.getSubCategories().isEmpty()) {
+        if (savedInstanceState != null) {
+            mCategoryItems = mStateSaverProvider.getParcelableArrayList(StateSaverProvider.STATE_ITEMS, savedInstanceState);
+            mDelegate.populateScreen(mCategoryItems);
+            return;
+        }
+
+        if (categoryData != null && !categoryData.getSubCategories().isEmpty()) {
             mCategoryItems = categoryData.getSubCategories();
             mDelegate.populateScreen(mCategoryItems);
         } else {
@@ -74,7 +85,7 @@ public class CategoriesViewLogic extends BaseViewLogic<CategoriesViewLogic.ViewL
 
     public void listItemSelected(int position) {
         CategoryData item = mCategoryItems.get(position);
-        
+
         Bundle bundle = new Bundle();
         bundle.putParcelable(CATEGORY_DATA, item);
 
@@ -112,6 +123,10 @@ public class CategoriesViewLogic extends BaseViewLogic<CategoriesViewLogic.ViewL
                 mDelegate.setSelectedItem(-1);
                 break;
         }
+    }
+
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        mStateSaverProvider.saveParcelableArrayList(StateSaverProvider.STATE_ITEMS, (ArrayList<? extends Parcelable>) mCategoryItems, outState);
     }
 
     public interface ViewLogicDelegate {

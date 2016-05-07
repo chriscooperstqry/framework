@@ -10,6 +10,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import nz.co.cjc.base.R;
@@ -36,6 +37,7 @@ public class DefaultCategoriesAndListingsProvider implements CategoriesAndListin
     private final NetworkRequestProvider mNetworkRequestProvider;
     private final StringsProvider mStringsProvider;
     private final ThreadUtilsProvider mThreadUtilsProvider;
+    private List<CategoryData> mCategoriesData;
 
     public DefaultCategoriesAndListingsProvider(@NonNull StringsProvider stringsProvider,
                                                 @NonNull NetworkRequestProvider networkRequestProvider,
@@ -43,10 +45,18 @@ public class DefaultCategoriesAndListingsProvider implements CategoriesAndListin
         mNetworkRequestProvider = networkRequestProvider;
         mStringsProvider = stringsProvider;
         mThreadUtilsProvider = threadUtilsProvider;
+        mCategoriesData = new ArrayList<>();
     }
 
     @Override
     public void getCategoriesData(@Nullable String categoryNumber, @NonNull final CategoriesRequestDelegate requestDelegate) {
+
+        //As this data is unlikely to change very frequently, to save parsing the data each time the fragment is recreated on orientation change,
+        // save the data for quick return
+        if (!mCategoriesData.isEmpty()) {
+            requestDelegate.requestSuccess(mCategoriesData);
+            return;
+        }
 
         if (StringUtils.isEmpty(categoryNumber)) {
             categoryNumber = "0";
@@ -72,6 +82,8 @@ public class DefaultCategoriesAndListingsProvider implements CategoriesAndListin
                     });
                     return;
                 }
+
+                mCategoriesData = result;
 
                 mThreadUtilsProvider.runOnMainThread(new Runnable() {
                     @Override

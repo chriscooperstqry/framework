@@ -36,7 +36,7 @@ public class CategoriesAndListingsActivity extends CoreActivity {
 
         initUI();
         mViewLogic = MainApp.getDagger().createCategoriesAndListingsViewLogic();
-        mViewLogic.initViewLogic(mViewLogicDelegate);
+        mViewLogic.initViewLogic(mViewLogicDelegate, savedInstanceState);
     }
 
     @Override

@@ -17,6 +17,7 @@
             android:layout_gravity="center"
             android:layout_marginRight="?attr/actionBarSize"
             android:ellipsize="start"
+            android:freezesText="true"
             android:gravity="center_vertical"
             android:maxLines="1"
             android:text="Home"
