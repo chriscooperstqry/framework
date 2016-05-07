@@ -6,8 +6,13 @@
 
     <!-- Dimens -->
     <dimen name="view_holder_listing_title_margins">16dp</dimen>
-    <dimen name="view_holder_listing_height">80dp</dimen>
+    <dimen name="view_holder_listing_height">100dp</dimen>
+
+    <dimen name="listing_title_size">18sp</dimen>
+    <dimen name="listing_subtitle_size">15sp</dimen>
 
     <!-- Colors-->
+    <color name="listing_title_color">@color/primary_text</color>
+    <color name="listing_subtitle_color">@color/secondary_text</color>
 
 </resources>

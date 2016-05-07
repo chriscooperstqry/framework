@@ -9,6 +9,10 @@
     <dimen name="view_holder_category_name_margins">16dp</dimen>
     <dimen name="view_holder_category_height">50dp</dimen>
 
+
+    <dimen name="category_name_size">18sp</dimen>
+
     <!-- Colors-->
+    <color name="category_name_color">@color/primary_text</color>
 
 </resources>

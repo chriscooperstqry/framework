@@ -17,7 +17,7 @@
         android:layout_marginLeft="@dimen/view_holder_category_name_margins"
         android:layout_marginRight="@dimen/view_holder_category_name_margins"
         android:layout_marginStart="@dimen/view_holder_category_name_margins"
-        android:textColor="@android:color/black"
-        android:textSize="18sp"/>
+        android:textColor="@color/category_name_color"
+        android:textSize="@dimen/category_name_size"/>
 
 </nz.co.cjc.base.framework.views.FRelativeLayout>

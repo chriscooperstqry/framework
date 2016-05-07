@@ -1,6 +1,6 @@
 package nz.co.cjc.base.features.categoriesandlistings.ui;
 
-import android.graphics.Color;
+import android.graphics.Typeface;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -72,9 +72,11 @@ public class CategoriesAdapter extends BaseAdapter {
         viewHolder.categoryName.setText(item.getName());
 
         if (mSelectedPosition == position) {
-            viewHolder.categoryName.setTextColor(Color.parseColor("#c03c03"));
+            viewHolder.categoryName.setTypeface(null, Typeface.BOLD);
+            viewHolder.categoryName.setTextColor(MainApp.getDagger().getApplicationContext().getResources().getColor(R.color.accent));
         } else {
-            viewHolder.categoryName.setTextColor(Color.parseColor("#000000"));
+            viewHolder.categoryName.setTypeface(null, Typeface.NORMAL);
+            viewHolder.categoryName.setTextColor((MainApp.getDagger().getApplicationContext().getResources().getColor(R.color.primary_text)));
         }
 
         return convertView;

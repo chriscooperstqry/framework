@@ -5,7 +5,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.bumptech.glide.DrawableRequestBuilder;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +64,7 @@ public class ListingsAdapter extends BaseAdapter {
         ViewHolder viewHolder;
 
         if (convertView == null) {
-            convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.viewholder_listing, parent, false);
+            convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.viewholder_listing_2, parent, false);
             viewHolder = new ViewHolder(convertView);
             convertView.setTag(viewHolder);
         } else {
@@ -65,16 +73,43 @@ public class ListingsAdapter extends BaseAdapter {
 
         ListingData item = getItem(position);
 
-        viewHolder.listingTitle.setText(item.getTitle());
+        viewHolder.title.setText(item.getTitle());
+        viewHolder.subTitle.setText(item.getPriceDisplay());
+        viewHolder.chevron.getDrawable().setColorFilter(MainApp.getDagger().getApplicationContext().getResources().getColor(R.color.primary_text),android.graphics.PorterDuff.Mode.MULTIPLY);
+
+        DrawableRequestBuilder<String> request = Glide.with(viewHolder.image.getContext())
+                .load(item.getImageUrl())
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .listener(new RequestListener<String, GlideDrawable>() {
+                    @Override
+                    public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                        return false;
+                    }
+                });
+
+        request.into(viewHolder.image);
 
         return convertView;
     }
 
+
     private static class ViewHolder {
-        public TextView listingTitle;
+        public TextView title;
+        public TextView subTitle;
+        public ImageView image;
+        public ImageView chevron;
 
         public ViewHolder(View view) {
-            listingTitle = ButterKnife.findById(view, R.id.title);
+            title = ButterKnife.findById(view, R.id.title);
+            subTitle = ButterKnife.findById(view, R.id.subtitle);
+            image = ButterKnife.findById(view, R.id.image);
+            chevron = ButterKnife.findById(view, R.id.chevron);
+
         }
     }
 
