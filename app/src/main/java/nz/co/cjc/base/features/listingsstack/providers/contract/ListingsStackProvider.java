@@ -52,4 +52,11 @@ public interface ListingsStackProvider {
      * @return the size
      */
     int size();
+
+    /**
+     * Check if we are displaying a current category that has no subcategories and
+     * is a direct child of the the root categories
+     * @return True if so, false otherwise
+     */
+    boolean isViewingEmptyRootSubcategory();
 }

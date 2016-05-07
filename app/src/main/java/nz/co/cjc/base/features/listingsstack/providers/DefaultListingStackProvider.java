@@ -51,5 +51,10 @@ public class DefaultListingStackProvider implements ListingsStackProvider {
         return mStack.size();
     }
 
+    @Override
+    public boolean isViewingEmptyRootSubcategory() {
+        return mStack.size() != 1 && mStack.peek().getSubCategories().isEmpty();
+    }
+
 
 }

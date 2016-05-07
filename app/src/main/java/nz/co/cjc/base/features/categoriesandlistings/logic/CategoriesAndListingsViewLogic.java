@@ -93,8 +93,7 @@ public class CategoriesAndListingsViewLogic extends BaseViewLogic<CategoriesAndL
                     //When we're clicking on a different option that is in the same list of the end category list
                     //We need to remove the current viewing from the stack and title, as
                     //really we're just replacing the current top state, not adding an additional item on.
-                    //Also, don't do this if we are on the root home page
-                    if (mListingsStackProvider.size() != 1 && mListingsStackProvider.isEndOfSubcategory()) {
+                    if (mListingsStackProvider.isViewingEmptyRootSubcategory()) {
                         mListingsStackProvider.removeListing();
                         removeToolbarText();
                     }
@@ -131,7 +130,7 @@ public class CategoriesAndListingsViewLogic extends BaseViewLogic<CategoriesAndL
     public boolean onBackPressed() {
         boolean bubbleUp = true;
 
-        if (mListingsStackProvider.size() != 1 && mListingsStackProvider.isEndOfSubcategory()) {
+        if (mListingsStackProvider.isViewingEmptyRootSubcategory()) {
             mEventBusProvider.postEvent(new CategoryEvent(null, CategoryEvent.EventType.ClearCategorySelection, null));
             bubbleUp = false;
         }

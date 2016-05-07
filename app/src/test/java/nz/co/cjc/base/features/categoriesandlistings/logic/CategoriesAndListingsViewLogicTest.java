@@ -301,8 +301,9 @@ public class CategoriesAndListingsViewLogicTest {
         CategoryEvent categoryEventWithNoSubcategories = new CategoryEvent(null, CategoryEvent.EventType.CategorySelected, bundleWithNoSubcategories);
 
         when(mListingsStackProvider.getTopListing()).thenReturn(categoryDataWithSubcategories);
-        when(mListingsStackProvider.isEndOfSubcategory()).thenReturn(true);
-        when(mListingsStackProvider.size()).thenReturn(2);
+        when(mListingsStackProvider.isViewingEmptyRootSubcategory()).thenReturn(true);
+//        when(mListingsStackProvider.isEndOfSubcategory()).thenReturn(true);
+//        when(mListingsStackProvider.size()).thenReturn(2);
 
         //Run
         mViewLogic.initViewLogic(mDelegate, null);
@@ -343,8 +344,7 @@ public class CategoriesAndListingsViewLogicTest {
     public void testOnBackPressedEndOfSubcategory() {
 
         //Setup
-        when(mListingsStackProvider.isEndOfSubcategory()).thenReturn(true);
-        when(mListingsStackProvider.size()).thenReturn(2);
+        when(mListingsStackProvider.isViewingEmptyRootSubcategory()).thenReturn(true);
         when(mListingsStackProvider.isListingsEmpty()).thenReturn(true);
         //Run
         mViewLogic.initViewLogic(mDelegate, null);
@@ -354,6 +354,21 @@ public class CategoriesAndListingsViewLogicTest {
         verify(mEventBusProvider).postEvent(mCategoryEventCaptor.capture());
         assertThat(mCategoryEventCaptor.getValue().getEventType(), is(CategoryEvent.EventType.ClearCategorySelection));
         assertThat(result, is(false));
+    }
+
+    @Test
+    public void testOnBackPressedNotEndOfSubcategory() {
+
+        //Setup
+        when(mListingsStackProvider.isViewingEmptyRootSubcategory()).thenReturn(false);
+        when(mListingsStackProvider.isListingsEmpty()).thenReturn(true);
+        //Run
+        mViewLogic.initViewLogic(mDelegate, null);
+        boolean result = mViewLogic.onBackPressed();
+
+        //Verify
+        verify(mEventBusProvider,never()).postEvent(any(CategoryEvent.class));
+        assertThat(result, is(true));
     }
 
     @Test
