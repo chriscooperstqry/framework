@@ -112,8 +112,9 @@ public class DefaultCategoriesAndListingsProvider implements CategoriesAndListin
                 + mStringsProvider.get(R.string.listings_url)
                 + mNetworkRequestProvider.getFileFormat()
                 + new Uri.Builder()
-                .appendQueryParameter("category", categoryNumber)
-                .appendQueryParameter("photo_size", "Medium")
+                .appendQueryParameter(QUERY_PARAM_CATEGORY, categoryNumber)
+                .appendQueryParameter(QUERY_PARAM_PHOTO_SIZE, mStringsProvider.get(R.string.default_photo_size))
+                .appendQueryParameter(QUERY_PARAM_ROWS, mStringsProvider.get(R.string.default_row_count))
                 .build()
                 .toString();
 

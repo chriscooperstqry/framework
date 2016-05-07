@@ -16,6 +16,9 @@ import nz.co.cjc.base.features.categoriesandlistings.models.ListingData;
 public interface CategoriesAndListingsProvider {
     String SUBCATEGORIES = "Subcategories";
     String LIST = "List";
+    String QUERY_PARAM_CATEGORY ="category";
+    String QUERY_PARAM_PHOTO_SIZE ="photo_size";
+    String QUERY_PARAM_ROWS ="rows";
 
     /**
      * Retrieve the categories from the api
