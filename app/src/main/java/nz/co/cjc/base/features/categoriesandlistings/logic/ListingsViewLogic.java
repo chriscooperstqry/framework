@@ -54,7 +54,7 @@ public class ListingsViewLogic extends BaseViewLogic<ListingsViewLogic.ViewLogic
         mListingItems = new ArrayList<>();
 
         if(savedInstanceState!=null){
-            mListingItems = mStateSaverProvider.getParcelableArrayList(StateSaverProvider.STATE_ITEMS, savedInstanceState);
+            mListingItems = mStateSaverProvider.getParcelableArrayList(StateSaverProvider.STATE_PARCELABLE_ARRAY_LIST, savedInstanceState);
             mDelegate.populateScreen(mListingItems);
         }
     }
@@ -110,7 +110,7 @@ public class ListingsViewLogic extends BaseViewLogic<ListingsViewLogic.ViewLogic
     }
 
     public void onSaveInstanceState(@NonNull Bundle outState) {
-        mStateSaverProvider.saveParcelableArrayList(StateSaverProvider.STATE_ITEMS, (ArrayList<? extends Parcelable>) mListingItems, outState);
+        mStateSaverProvider.saveParcelableArrayList(StateSaverProvider.STATE_PARCELABLE_ARRAY_LIST, (ArrayList<? extends Parcelable>) mListingItems, outState);
     }
 
     public interface ViewLogicDelegate {

@@ -36,6 +36,7 @@ public class CategoriesViewLogic extends BaseViewLogic<CategoriesViewLogic.ViewL
     private final EventBusProvider mEventBusProvider;
     private final StateSaverProvider mStateSaverProvider;
     private List<CategoryData> mCategoryItems;
+    private int mSelectedItem;
 
     @Inject
     public CategoriesViewLogic(@NonNull StringsProvider stringsProvider,
@@ -54,10 +55,13 @@ public class CategoriesViewLogic extends BaseViewLogic<CategoriesViewLogic.ViewL
 
         CategoryData categoryData = arguments.getParcelable(CATEGORY_DATA);
         mCategoryItems = new ArrayList<>();
+        mSelectedItem = -1;
 
         if (savedInstanceState != null) {
-            mCategoryItems = mStateSaverProvider.getParcelableArrayList(StateSaverProvider.STATE_ITEMS, savedInstanceState);
+            mCategoryItems = mStateSaverProvider.getParcelableArrayList(StateSaverProvider.STATE_PARCELABLE_ARRAY_LIST, savedInstanceState);
+            mSelectedItem = mStateSaverProvider.getInt(StateSaverProvider.STATE_INT, savedInstanceState, -1);
             mDelegate.populateScreen(mCategoryItems);
+            mDelegate.setSelectedItem(mSelectedItem);
             return;
         }
 
@@ -93,6 +97,7 @@ public class CategoriesViewLogic extends BaseViewLogic<CategoriesViewLogic.ViewL
 
         if (item.getSubCategories().isEmpty()) {
             mDelegate.setSelectedItem(position);
+            mSelectedItem = position;
         }
     }
 
@@ -126,7 +131,8 @@ public class CategoriesViewLogic extends BaseViewLogic<CategoriesViewLogic.ViewL
     }
 
     public void onSaveInstanceState(@NonNull Bundle outState) {
-        mStateSaverProvider.saveParcelableArrayList(StateSaverProvider.STATE_ITEMS, (ArrayList<? extends Parcelable>) mCategoryItems, outState);
+        mStateSaverProvider.saveParcelableArrayList(StateSaverProvider.STATE_PARCELABLE_ARRAY_LIST, (ArrayList<? extends Parcelable>) mCategoryItems, outState);
+        mStateSaverProvider.saveInt(StateSaverProvider.STATE_INT, mSelectedItem, outState);
     }
 
     public interface ViewLogicDelegate {

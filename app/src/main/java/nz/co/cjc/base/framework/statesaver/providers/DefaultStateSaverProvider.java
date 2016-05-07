@@ -16,28 +16,25 @@ import nz.co.cjc.base.framework.statesaver.providers.contract.StateSaverProvider
  */
 public class DefaultStateSaverProvider implements StateSaverProvider {
 
-    /**
-     * Save the given array list data into the given bundle
-     *
-     * @param key    The key to the data
-     * @param value  The data
-     * @param bundle The bundle to save it to
-     */
+
     @Override
     public void saveParcelableArrayList(@NonNull String key, @NonNull ArrayList<? extends Parcelable> value, @NonNull Bundle bundle) {
         bundle.putParcelableArrayList(key, value);
     }
 
-    /**
-     * Get the saved array list data associated with the given key
-     *
-     * @param key    To lookup
-     * @param bundle To look in
-     * @return The array list if found, null otherwise
-     */
     @Nullable
     @Override
     public <T extends Parcelable> ArrayList<T> getParcelableArrayList(@NonNull String key, @NonNull Bundle bundle) {
         return bundle.getParcelableArrayList(key);
+    }
+
+    @Override
+    public void saveInt(@NonNull String key, int value, @NonNull Bundle bundle) {
+        bundle.putInt(key, value);
+    }
+
+    @Override
+    public int getInt(@NonNull String key, @NonNull Bundle bundle, int defaultValue) {
+        return bundle.getInt(key, defaultValue);
     }
 }
