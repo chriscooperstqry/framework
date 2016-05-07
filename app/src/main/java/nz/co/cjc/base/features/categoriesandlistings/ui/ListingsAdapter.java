@@ -23,6 +23,7 @@ import nz.co.cjc.base.R;
 import nz.co.cjc.base.features.categoriesandlistings.models.ListingData;
 import nz.co.cjc.base.framework.application.MainApp;
 import nz.co.cjc.base.framework.strings.providers.contracts.StringsProvider;
+import nz.co.cjc.base.framework.utils.StringUtils;
 
 /**
  * Created by Chris Cooper on 6/05/16.
@@ -75,24 +76,29 @@ public class ListingsAdapter extends BaseAdapter {
 
         viewHolder.title.setText(item.getTitle());
         viewHolder.subTitle.setText(item.getPriceDisplay());
-        viewHolder.chevron.getDrawable().setColorFilter(MainApp.getDagger().getApplicationContext().getResources().getColor(R.color.primary_text),android.graphics.PorterDuff.Mode.MULTIPLY);
+        viewHolder.chevron.getDrawable().setColorFilter(MainApp.getDagger().getApplicationContext().getResources().getColor(R.color.primary_text), android.graphics.PorterDuff.Mode.MULTIPLY);
 
-        DrawableRequestBuilder<String> request = Glide.with(viewHolder.image.getContext())
-                .load(item.getImageUrl())
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .listener(new RequestListener<String, GlideDrawable>() {
-                    @Override
-                    public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
-                        return false;
-                    }
+        if (StringUtils.isEmpty(item.getImageUrl())) {
+            viewHolder.image.setImageDrawable(MainApp.getDagger().getApplicationContext().getResources().getDrawable(R.mipmap.ic_placeholder));
+        } else {
+            //Listener here in case we use image transitions
+            DrawableRequestBuilder<String> request = Glide.with(viewHolder.image.getContext())
+                    .load(item.getImageUrl())
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .listener(new RequestListener<String, GlideDrawable>() {
+                        @Override
+                        public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+                            return false;
+                        }
 
-                    @Override
-                    public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
-                        return false;
-                    }
-                });
+                        @Override
+                        public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                            return false;
+                        }
+                    });
 
-        request.into(viewHolder.image);
+            request.into(viewHolder.image);
+        }
 
         return convertView;
     }

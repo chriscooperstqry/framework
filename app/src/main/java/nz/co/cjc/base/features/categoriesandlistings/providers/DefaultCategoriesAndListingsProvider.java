@@ -114,7 +114,11 @@ public class DefaultCategoriesAndListingsProvider implements CategoriesAndListin
         String url = mNetworkRequestProvider.getBaseUrl()
                 + mStringsProvider.get(R.string.listings_url)
                 + mNetworkRequestProvider.getFileFormat()
-                + new Uri.Builder().appendQueryParameter("category", categoryNumber).build().toString();
+                + new Uri.Builder()
+                .appendQueryParameter("category", categoryNumber)
+                .appendQueryParameter("photo_size", "Medium")
+                .build()
+                .toString();
 
 
         NetworkRequestProperties networkRequestProperties = NetworkRequestProperties.create().url(url).respondOnMainThread(false);
