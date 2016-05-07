@@ -90,10 +90,9 @@ public class CategoriesAndListingsViewLogic extends BaseViewLogic<CategoriesAndL
                 //If this category doesn't have any more subcategories, and we're not clicking on the same category that is already displaying
                 else if (datasSubcategories.isEmpty() && !mListingsStackProvider.getTopListing().getNumber().equals(categoryNumber)) {
 
-                    //When we're clicking on a different option that is in the same list of the end category list
-                    //We need to remove the current viewing from the stack and title, as
-                    //really we're just replacing the current top state, not adding an additional item on.
-                    if (mListingsStackProvider.isViewingEmptyRootSubcategory()) {
+                    //Check if we are viewing a category that has no more subcategories, but is also not the root home page.
+                    //We want to remove the current stack state, as we will not be chaining from here, just updating.
+                    if (mListingsStackProvider.isViewingNonRootEmptySubcategory()) {
                         mListingsStackProvider.removeListing();
                         removeToolbarText();
                     }
@@ -130,13 +129,16 @@ public class CategoriesAndListingsViewLogic extends BaseViewLogic<CategoriesAndL
     public boolean onBackPressed() {
         boolean bubbleUp = true;
 
-        if (mListingsStackProvider.isViewingEmptyRootSubcategory()) {
+        //Check if we are viewing a category that has no more subcategories, but is also not the root home page.
+        //If so, just clear the current bolded selection, and return that we don't want a back stack change to happen
+        if (mListingsStackProvider.isViewingNonRootEmptySubcategory()) {
             mEventBusProvider.postEvent(new CategoryEvent(null, CategoryEvent.EventType.ClearCategorySelection, null));
             bubbleUp = false;
         }
 
         mListingsStackProvider.removeListing();
 
+        //Check that we are not backing out of the app completely
         if (!mListingsStackProvider.isListingsEmpty()) {
             removeToolbarText();
             mEventBusProvider.postEvent(new ListingsEvent(null, ListingsEvent.EventType.UpdateListings, mListingsStackProvider.getTopListing().getNumber()));

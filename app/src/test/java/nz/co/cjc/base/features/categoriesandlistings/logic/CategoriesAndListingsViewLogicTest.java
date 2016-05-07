@@ -301,7 +301,7 @@ public class CategoriesAndListingsViewLogicTest {
         CategoryEvent categoryEventWithNoSubcategories = new CategoryEvent(null, CategoryEvent.EventType.CategorySelected, bundleWithNoSubcategories);
 
         when(mListingsStackProvider.getTopListing()).thenReturn(categoryDataWithSubcategories);
-        when(mListingsStackProvider.isViewingEmptyRootSubcategory()).thenReturn(true);
+        when(mListingsStackProvider.isViewingNonRootEmptySubcategory()).thenReturn(true);
 //        when(mListingsStackProvider.isEndOfSubcategory()).thenReturn(true);
 //        when(mListingsStackProvider.size()).thenReturn(2);
 
@@ -344,7 +344,7 @@ public class CategoriesAndListingsViewLogicTest {
     public void testOnBackPressedEndOfSubcategory() {
 
         //Setup
-        when(mListingsStackProvider.isViewingEmptyRootSubcategory()).thenReturn(true);
+        when(mListingsStackProvider.isViewingNonRootEmptySubcategory()).thenReturn(true);
         when(mListingsStackProvider.isListingsEmpty()).thenReturn(true);
         //Run
         mViewLogic.initViewLogic(mDelegate, null);
@@ -360,7 +360,7 @@ public class CategoriesAndListingsViewLogicTest {
     public void testOnBackPressedNotEndOfSubcategory() {
 
         //Setup
-        when(mListingsStackProvider.isViewingEmptyRootSubcategory()).thenReturn(false);
+        when(mListingsStackProvider.isViewingNonRootEmptySubcategory()).thenReturn(false);
         when(mListingsStackProvider.isListingsEmpty()).thenReturn(true);
         //Run
         mViewLogic.initViewLogic(mDelegate, null);

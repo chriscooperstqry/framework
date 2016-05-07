@@ -55,8 +55,8 @@ public interface ListingsStackProvider {
 
     /**
      * Check if we are displaying a current category that has no subcategories and
-     * is a direct child of the the root categories
+     * we are not on the root listing view (home page)
      * @return True if so, false otherwise
      */
-    boolean isViewingEmptyRootSubcategory();
+    boolean isViewingNonRootEmptySubcategory();
 }
