@@ -26,7 +26,7 @@ import nz.co.cjc.base.framework.utils.StringUtils;
 
 /**
  * Created by Chris Cooper on 5/05/16.
- * <p>
+ * <p/>
  * Implementation of the categories and listings provider
  */
 public class DefaultCategoriesAndListingsProvider implements CategoriesAndListingsProvider {
@@ -92,12 +92,22 @@ public class DefaultCategoriesAndListingsProvider implements CategoriesAndListin
 
             @Override
             public void onRequestFailed(int statusCode, @NonNull String response) {
-                requestDelegate.requestFailed();
+                mThreadUtilsProvider.runOnMainThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        requestDelegate.requestFailed();
+                    }
+                });
             }
 
             @Override
             public void onConnectionFailed() {
-                requestDelegate.requestFailed();
+                mThreadUtilsProvider.runOnMainThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        requestDelegate.requestFailed();
+                    }
+                });
             }
         });
     }
@@ -146,12 +156,22 @@ public class DefaultCategoriesAndListingsProvider implements CategoriesAndListin
 
             @Override
             public void onRequestFailed(int statusCode, @NonNull String response) {
-                requestDelegate.requestFailed();
+                mThreadUtilsProvider.runOnMainThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        requestDelegate.requestFailed();
+                    }
+                });
             }
 
             @Override
             public void onConnectionFailed() {
-                requestDelegate.requestFailed();
+                mThreadUtilsProvider.runOnMainThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        requestDelegate.requestFailed();
+                    }
+                });
             }
         });
     }
