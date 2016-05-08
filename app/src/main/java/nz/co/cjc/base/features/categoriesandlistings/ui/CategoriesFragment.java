@@ -10,6 +10,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import java.util.List;
 
@@ -30,6 +32,8 @@ import nz.co.cjc.base.framework.constants.AppConstants;
 public class CategoriesFragment extends Fragment {
 
     private ListView mListView;
+    private ProgressBar mProgressBar;
+    private TextView mErrorView;
     private CategoriesAdapter mAdapter;
 
     @Inject
@@ -78,6 +82,8 @@ public class CategoriesFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         mListView = null;
+        mErrorView = null;
+        mProgressBar = null;
     }
 
     @Override
@@ -107,6 +113,8 @@ public class CategoriesFragment extends Fragment {
     //region private
     private void initUI(View view) {
         mListView = ButterKnife.findById(view, R.id.list_view);
+        mErrorView = ButterKnife.findById(view, R.id.error_view);
+        mProgressBar = ButterKnife.findById(view, R.id.progress_bar);
         mAdapter = new CategoriesAdapter();
         mListView.setAdapter(mAdapter);
 
@@ -125,6 +133,15 @@ public class CategoriesFragment extends Fragment {
             }
         });
 
+        mErrorView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mViewLogic != null) {
+                    mViewLogic.onErrorViewClick();
+                }
+            }
+        });
+
     }
     //end region
 
@@ -138,6 +155,26 @@ public class CategoriesFragment extends Fragment {
         @Override
         public void setSelectedItem(int position) {
             mAdapter.setSelectedItem(position);
+        }
+
+        @Override
+        public void hideProgressBar() {
+            mProgressBar.setVisibility(View.GONE);
+        }
+
+        @Override
+        public void hideErrorView() {
+            mErrorView.setVisibility(View.GONE);
+        }
+
+        @Override
+        public void showErrorView() {
+            mErrorView.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        public void showProgressBar() {
+            mProgressBar.setVisibility(View.VISIBLE);
         }
 
     };

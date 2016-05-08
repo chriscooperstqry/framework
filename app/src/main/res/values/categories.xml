@@ -4,6 +4,9 @@
     <string name="categories_url">Categories/</string>
     <string name="sticky_header_trade_me_category">Trade Me Categories</string>
     <string name="sticky_header_trade_me_suffix">Trade Me</string>
+    <string name="error_text">Something went wrong.\nPlease check your network settings and tap to
+        retry
+    </string>
 
     <!-- Dimens -->
     <dimen name="view_holder_category_name_margins">16dp</dimen>

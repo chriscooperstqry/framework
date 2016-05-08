@@ -14,7 +14,6 @@ import javax.inject.Inject;
 import nz.co.cjc.base.features.categoriesandlistings.events.CategoryEvent;
 import nz.co.cjc.base.features.categoriesandlistings.models.CategoryData;
 import nz.co.cjc.base.features.categoriesandlistings.providers.contract.CategoriesAndListingsProvider;
-import nz.co.cjc.base.framework.application.MainApp;
 import nz.co.cjc.base.framework.core.logic.BaseViewLogic;
 import nz.co.cjc.base.framework.eventbus.providers.contracts.EventBusProvider;
 import nz.co.cjc.base.framework.eventbus.providers.contracts.EventBusSubscriber;
@@ -65,22 +64,30 @@ public class CategoriesViewLogic extends BaseViewLogic<CategoriesViewLogic.ViewL
             mDelegate.populateScreen(mCategoryItems);
             mDelegate.setSelectedItem(mSelectedItem);
         } else {
-            mCategoriesAndListingsProvider.getCategoriesData(null, new CategoriesAndListingsProvider.CategoriesRequestDelegate() {
-                @Override
-                public void requestSuccess(@NonNull List<CategoryData> categories) {
-                    mCategoryItems = categories;
-                    mDelegate.populateScreen(categories);
-                }
-
-                @Override
-                public void requestFailed() {
-                    //TODO present error
-                    MainApp.getDagger().getLoggingProvider().d("failed");
-                }
-            });
-
+            fetchData();
         }
 
+    }
+
+    private void fetchData() {
+        mDelegate.showProgressBar();
+        mDelegate.hideErrorView();
+
+        mCategoriesAndListingsProvider.getCategoriesData(null, new CategoriesAndListingsProvider.CategoriesRequestDelegate() {
+            @Override
+            public void requestSuccess(@NonNull List<CategoryData> categories) {
+                mCategoryItems = categories;
+                mDelegate.populateScreen(categories);
+                mDelegate.hideProgressBar();
+                mDelegate.hideErrorView();
+            }
+
+            @Override
+            public void requestFailed() {
+                mDelegate.hideProgressBar();
+                mDelegate.showErrorView();
+            }
+        });
     }
 
     public void listItemSelected(int position) {
@@ -131,6 +138,10 @@ public class CategoriesViewLogic extends BaseViewLogic<CategoriesViewLogic.ViewL
         mStateSaverProvider.saveInt(StateSaverProvider.STATE_INT, mSelectedItem, outState);
     }
 
+    public void onErrorViewClick() {
+        fetchData();
+    }
+
     public interface ViewLogicDelegate {
 
         /**
@@ -146,5 +157,25 @@ public class CategoriesViewLogic extends BaseViewLogic<CategoriesViewLogic.ViewL
          * @param position in the adapter
          */
         void setSelectedItem(int position);
+
+        /**
+         * Hide the progress bar
+         */
+        void hideProgressBar();
+
+        /**
+         * Hide the error view displaying something went wrong
+         */
+        void hideErrorView();
+
+        /**
+         * Show the error view
+         */
+        void showErrorView();
+
+        /**
+         * Show the progress bar
+         */
+        void showProgressBar();
     }
 }
