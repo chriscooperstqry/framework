@@ -79,7 +79,6 @@ public class CategoriesViewLogic extends BaseViewLogic<CategoriesViewLogic.ViewL
                 mCategoryItems = categories;
                 mDelegate.populateScreen(categories);
                 mDelegate.hideProgressBar();
-                mDelegate.hideErrorView();
             }
 
             @Override

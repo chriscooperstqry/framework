@@ -1,8 +1,9 @@
 package nz.co.cjc.base.features.categoriesandlistings.logic;
 
-import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import android.os.Parcelable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -10,6 +11,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
+import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -19,48 +21,44 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.annotation.Config;
 
 import java.util.List;
 
 import nz.co.cjc.base.BuildConfig;
-import nz.co.cjc.base.R;
 import nz.co.cjc.base.features.categoriesandlistings.events.CategoryEvent;
-import nz.co.cjc.base.features.categoriesandlistings.events.ListingsEvent;
 import nz.co.cjc.base.features.categoriesandlistings.models.CategoryData;
 import nz.co.cjc.base.features.categoriesandlistings.providers.contract.CategoriesAndListingsProvider;
-import nz.co.cjc.base.features.categoriesandlistings.ui.CategoriesFragment;
-import nz.co.cjc.base.features.categoriesandlistings.ui.ListingsFragment;
-import nz.co.cjc.base.features.listingsstack.providers.contract.ListingsStackProvider;
 import nz.co.cjc.base.framework.eventbus.providers.contracts.EventBusProvider;
+import nz.co.cjc.base.framework.statesaver.providers.contract.StateSaverProvider;
 import nz.co.cjc.base.framework.strings.providers.contracts.StringsProvider;
 import nz.co.cjc.base.robolectric.RobolectricBuildConfig;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
+import static org.hamcrest.Matchers.isEmptyOrNullString;
+import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 /**
- * Created by Chris Cooper on 7/05/16.
+ * Created by Chris Cooper on 8/05/16.
  * <p>
- * Tests suite for categories and listings view logic
+ * Tests for categories view logic
  */
 @RunWith(RobolectricGradleTestRunner.class)
 @Config(sdk = RobolectricBuildConfig.ROBOLECTRIC_SDK, constants = BuildConfig.class)
-public class CategoriesAndListingsViewLogicTest {
+public class CategoriesViewLogicTest {
 
-    @Mock
-    Context mApplicationContext;
+    @Spy
+    TestCategoriesAndListingsProvider mCategoriesAndListingsProvider;
 
     @Mock
     private StringsProvider mStringsProvider;
@@ -69,42 +67,36 @@ public class CategoriesAndListingsViewLogicTest {
     EventBusProvider mEventBusProvider;
 
     @Mock
-    ListingsStackProvider mListingsStackProvider;
+    StateSaverProvider mStateSaverProvider;
 
     @Mock
-    CategoriesAndListingsViewLogic.ViewLogicDelegate mDelegate;
+    CategoriesViewLogic.ViewLogicDelegate mDelegate;
 
     @Captor
-    ArgumentCaptor<ListingsEvent> mListingsEventCaptor;
+    ArgumentCaptor<List<CategoryData>> mCategoryDataListCaptor;
 
     @Captor
     ArgumentCaptor<CategoryEvent> mCategoryEventCaptor;
 
     @Captor
-    ArgumentCaptor<CategoryData> mCategoryDataCaptor;
+    ArgumentCaptor<String> mStringCaptor;
 
     @Captor
-    ArgumentCaptor<Fragment> mFragmentCaptor;
-
-    @Captor
-    ArgumentCaptor<Integer> mIntegerCaptor;
-
-    @Captor
-    ArgumentCaptor<Boolean> mBooleanCaptor;
+    ArgumentCaptor<CategoriesAndListingsProvider.CategoriesRequestDelegate> mCategoriesRequestDelegateCaptor;
 
     @Rule
     public ExpectedException mExpectedException = ExpectedException.none();
 
-    private CategoriesAndListingsViewLogic mViewLogic;
-
+    private CategoriesViewLogic mViewLogic;
 
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        mViewLogic = new CategoriesAndListingsViewLogic(
+        mViewLogic = new CategoriesViewLogic(
                 mStringsProvider,
+                mCategoriesAndListingsProvider,
                 mEventBusProvider,
-                mListingsStackProvider);
+                mStateSaverProvider);
 
     }
 
@@ -112,69 +104,158 @@ public class CategoriesAndListingsViewLogicTest {
     public void testInitViewLogicNullDelegate() {
 
         //Run
-        mViewLogic.initViewLogic(null, null);
+        mViewLogic.initViewLogic(null, new Bundle(), null);
 
         //Verify
         verifyZeroInteractions(mDelegate);
     }
 
     @Test
-    public void testInitViewLogicNullSavedInstanceState() {
+    public void testInitViewLogicNoSavedInstance() {
 
         //Run
-        mViewLogic.initViewLogic(mDelegate, null);
+        mViewLogic.initViewLogic(mDelegate, new Bundle(), null);
 
         //Verify
-        verify(mListingsStackProvider).addListing(mCategoryDataCaptor.capture());
-        verify(mDelegate, times(2)).presentFragment(mFragmentCaptor.capture(), mIntegerCaptor.capture(), mBooleanCaptor.capture());
+        verifyZeroInteractions(mStateSaverProvider);
+    }
 
-        assertThat(mCategoryDataCaptor.getValue().getName(), is(""));
-        assertThat(mCategoryDataCaptor.getValue().getNumber(), is(""));
-        assertThat(mCategoryDataCaptor.getValue().getPath(), is(""));
-        assertThat(mCategoryDataCaptor.getValue().getSubCategories().size(), is(0));
+    @Test
+    public void testInitViewLogicSavedInstance() {
 
-        List<Fragment> capturedFragments = mFragmentCaptor.getAllValues();
-        assertThat(capturedFragments.get(0), instanceOf(CategoriesFragment.class));
-        assertThat(capturedFragments.get(1), instanceOf(ListingsFragment.class));
+        //Setup
+        Bundle args = new Bundle();
+        args.putParcelable("Category.Data", generateCategoryDataWithSubcategories().get(0));
 
-        List<Integer> capturedInts = mIntegerCaptor.getAllValues();
-        assertThat(capturedInts.get(0), is(R.id.categories_container));
-        assertThat(capturedInts.get(1), is(R.id.listings_container));
+        Bundle state = new Bundle();
+        when(mStateSaverProvider.getInt("State.Int", state, -1)).thenReturn(5);
 
-        List<Boolean> capturedBools = mBooleanCaptor.getAllValues();
-        assertThat(capturedBools.get(0), is(false));
-        assertThat(capturedBools.get(1), is(false));
+        //Run
+        mViewLogic.initViewLogic(mDelegate, args, state);
+
+        //Verify
+        verify(mStateSaverProvider).getInt("State.Int", state, -1);
+        verify(mDelegate).setSelectedItem(5);
+    }
+
+    @Test
+    public void testSavedCategoryData() {
+
+        //Setup
+        Bundle bundle = new Bundle();
+        bundle.putParcelable("Category.Data", generateCategoryDataWithSubcategories().get(0));
+
+        //Run
+        mViewLogic.initViewLogic(mDelegate, bundle, null);
+
+        //Verify
+        verify(mDelegate).populateScreen(mCategoryDataListCaptor.capture());
+        verify(mDelegate).setSelectedItem(anyInt());
+        assertThat(mCategoryDataListCaptor.getValue().size(), is(4));
+
+        verifyZeroInteractions(mCategoriesAndListingsProvider);
+    }
+
+    @Test
+    public void testFetchDataSuccess() {
+
+        //Setup
+        mCategoriesAndListingsProvider.requestAction = TestCategoriesAndListingsProvider.RequestAction.Success;
+        List<CategoryData> resultData = generateCategoryDataWithSubcategories();
+        mCategoriesAndListingsProvider.requestResult = resultData;
+
+        //Run
+        mViewLogic.initViewLogic(mDelegate, new Bundle(), null);
+
+        //Verify
+        verify(mDelegate).showProgressBar();
+        verify(mDelegate).hideErrorView();
+        verify(mCategoriesAndListingsProvider).getCategoriesData(mStringCaptor.capture(), mCategoriesRequestDelegateCaptor.capture());
+        verify(mDelegate).populateScreen(resultData);
+        verify(mDelegate).hideProgressBar();
+        verify(mDelegate, never()).showErrorView();
+        assertThat(mStringCaptor.getValue(), is(isEmptyOrNullString()));
+    }
+
+    @Test
+    public void testFetchDataFailed() {
+
+        //Setup
+        mCategoriesAndListingsProvider.requestAction = TestCategoriesAndListingsProvider.RequestAction.Failed;
+
+        //Run
+        mViewLogic.initViewLogic(mDelegate, new Bundle(), null);
+
+        //Verify
+        verify(mDelegate).showProgressBar();
+        verify(mDelegate).hideErrorView();
+        verify(mCategoriesAndListingsProvider).getCategoriesData(mStringCaptor.capture(), mCategoriesRequestDelegateCaptor.capture());
+        verify(mDelegate,never()).populateScreen(anyListOf(CategoryData.class));
+        verify(mDelegate).hideProgressBar();
+        verify(mDelegate).showErrorView();
+        assertThat(mStringCaptor.getValue(), is(isEmptyOrNullString()));
 
     }
 
     @Test
-    public void testInitViewLogicNotNullSavedInstanceState() {
+    public void testListItemSelectedWithSubcategories() {
+
+        //Setup
+        mCategoriesAndListingsProvider.requestAction = TestCategoriesAndListingsProvider.RequestAction.Success;
+        List<CategoryData> resultData = generateCategoryDataWithSubcategories();
+        mCategoriesAndListingsProvider.requestResult = resultData;
+        CategoryData dataAtPosOne = resultData.get(1);
 
         //Run
-        mViewLogic.initViewLogic(mDelegate, new Bundle());
+        mViewLogic.initViewLogic(mDelegate, new Bundle(), null);
+        mViewLogic.listItemSelected(1);
 
         //Verify
-        verify(mListingsStackProvider, never()).addListing(any(CategoryData.class));
-        verify(mDelegate, never()).presentFragment(any(Fragment.class), anyInt(), anyBoolean());
+        verify(mEventBusProvider).postEvent(mCategoryEventCaptor.capture());
+        verify(mDelegate, never()).setSelectedItem(anyInt());
+        assertThat(mCategoryEventCaptor.getValue().getEventType(), is(CategoryEvent.EventType.CategorySelected));
+        assertThat(mCategoryEventCaptor.getValue().getBundle().getParcelable("Category.Data"), Matchers.<Parcelable>is(dataAtPosOne));
+    }
 
+    @Test
+    public void testListItemSelectedWithNoSubcategories() {
+
+        //Setup
+        mCategoriesAndListingsProvider.requestAction = TestCategoriesAndListingsProvider.RequestAction.Success;
+        List<CategoryData> resultData = generateCategoryDataWithNoSubcategories();
+        mCategoriesAndListingsProvider.requestResult = resultData;
+        CategoryData dataAtPosOne = resultData.get(1);
+
+        //Run
+        mViewLogic.initViewLogic(mDelegate, new Bundle(), null);
+        mViewLogic.listItemSelected(1);
+
+        //Verify
+        verify(mEventBusProvider).postEvent(mCategoryEventCaptor.capture());
+        verify(mDelegate).setSelectedItem(1);
+        assertThat(mCategoryEventCaptor.getValue().getEventType(), is(CategoryEvent.EventType.CategorySelected));
+        assertThat(mCategoryEventCaptor.getValue().getBundle().getParcelable("Category.Data"), Matchers.<Parcelable>is(dataAtPosOne));
     }
 
     @Test
     public void testScreenResumed() {
 
         //Run
-        mViewLogic.initViewLogic(mDelegate, null);
+        mViewLogic.initViewLogic(mDelegate, new Bundle(), null);
         mViewLogic.screenResumed();
 
         //Verify
         verify(mEventBusProvider).subscribe(mViewLogic);
+        verify(mEventBusProvider).postEvent(mCategoryEventCaptor.capture());
+        assertThat(mCategoryEventCaptor.getValue().getEventType(), is(CategoryEvent.EventType.CategoryLayoutReady));
+        assertThat(mCategoryEventCaptor.getValue().getBundle(), is(nullValue()));
     }
 
     @Test
     public void testScreenPaused() {
 
         //Run
-        mViewLogic.initViewLogic(mDelegate, null);
+        mViewLogic.initViewLogic(mDelegate, new Bundle(), null);
         mViewLogic.screenPaused();
 
         //Verify
@@ -182,235 +263,90 @@ public class CategoriesAndListingsViewLogicTest {
     }
 
     @Test
-    public void testOnEventCategorySelectedNullBundle() {
-
+    public void testOnEventClearCategorySelection() {
         //Setup
-        CategoryEvent categoryEvent = new CategoryEvent(null, CategoryEvent.EventType.CategorySelected, null);
-
-        mExpectedException.expect(IllegalArgumentException.class);
-        mExpectedException.expectMessage("Must provide category data");
+        CategoryEvent categoryEvent = new CategoryEvent(null, CategoryEvent.EventType.ClearCategorySelection, null);
 
         //Run
-        mViewLogic.initViewLogic(mDelegate, null);
-        mViewLogic.onEvent(categoryEvent);
-    }
-
-    @Test
-    public void testOnEventCategorySelectedNoCategoryData() {
-
-        //Setup
-        CategoryEvent categoryEvent = new CategoryEvent(null, CategoryEvent.EventType.CategorySelected, new Bundle());
-
-        mExpectedException.expect(IllegalArgumentException.class);
-        mExpectedException.expectMessage("Must provide category data");
-
-        //Run
-        mViewLogic.initViewLogic(mDelegate, null);
-        mViewLogic.onEvent(categoryEvent);
-    }
-
-    @Test
-    public void testOnEventCategorySelectedWithSubcategories() {
-
-        //Setup
-        Bundle bundle = new Bundle();
-        CategoryData categoryData = generateCategoryDataWithSubcategories().get(0);
-        bundle.putParcelable(CategoriesViewLogic.CATEGORY_DATA, categoryData);
-        CategoryEvent categoryEvent = new CategoryEvent(null, CategoryEvent.EventType.CategorySelected, bundle);
-
-        //Run
-        mViewLogic.initViewLogic(mDelegate, null);
-        reset(mDelegate);
-        when(mDelegate.getToolbarTitle()).thenReturn("Title");
+        mViewLogic.initViewLogic(mDelegate, new Bundle(), null);
         mViewLogic.onEvent(categoryEvent);
 
         //Verify
-        verify(mDelegate).getToolbarTitle();
-        verify(mDelegate).updateToolbarText("Title > Dinghies & rowboats");
-        verify(mListingsStackProvider).addListing(categoryData);
-        verify(mEventBusProvider).postEvent(mListingsEventCaptor.capture());
-        verify(mDelegate).presentFragment(mFragmentCaptor.capture(), mIntegerCaptor.capture(), mBooleanCaptor.capture());
-        verify(mDelegate, never()).closeSlidingPanel();
-
-        assertThat(mListingsEventCaptor.getValue().getEventType(), is(ListingsEvent.EventType.UpdateListings));
-        assertThat(mListingsEventCaptor.getValue().getCategoryNumber(), is("0001-0348-1261-"));
-
-        assertThat(mFragmentCaptor.getValue(), instanceOf(CategoriesFragment.class));
-        assertThat(mIntegerCaptor.getValue(), is(R.id.categories_container));
-        assertThat(mBooleanCaptor.getValue(), is(true));
+        verify(mDelegate).setSelectedItem(-1);
     }
 
     @Test
-    public void testOnEventCategorySelectedWithNoSubcategories() {
+    public void testSaveInstanceState() {
 
         //Setup
-        Bundle bundleWithSubcategories = new Bundle();
-        CategoryData categoryDataWithSubcategories = generateCategoryDataWithSubcategories().get(0);
-        bundleWithSubcategories.putParcelable(CategoriesViewLogic.CATEGORY_DATA, categoryDataWithSubcategories);
-        CategoryEvent categoryEventWithSubcategories = new CategoryEvent(null, CategoryEvent.EventType.CategorySelected, bundleWithSubcategories);
-
-        Bundle bundleWithNoSubcategories = new Bundle();
-        CategoryData categoryDataWithNoSubcategories = generateCategoryDataWithNoSubcategories().get(0);
-        bundleWithNoSubcategories.putParcelable(CategoriesViewLogic.CATEGORY_DATA, categoryDataWithNoSubcategories);
-        CategoryEvent categoryEventWithNoSubcategories = new CategoryEvent(null, CategoryEvent.EventType.CategorySelected, bundleWithNoSubcategories);
-
-        when(mListingsStackProvider.getTopListing()).thenReturn(categoryDataWithSubcategories);
+        Bundle outState = new Bundle();
+        mCategoriesAndListingsProvider.requestAction = TestCategoriesAndListingsProvider.RequestAction.Success;
+        mCategoriesAndListingsProvider.requestResult = generateCategoryDataWithSubcategories();
 
         //Run
-        mViewLogic.initViewLogic(mDelegate, null);
-        mViewLogic.onEvent(categoryEventWithSubcategories);
-        reset(mDelegate, mEventBusProvider);
-        when(mDelegate.getToolbarTitle()).thenReturn("Title");
-        mViewLogic.onEvent(categoryEventWithNoSubcategories);
-
+        mViewLogic.initViewLogic(mDelegate, new Bundle(), null);
+        mViewLogic.listItemSelected(3);
+        mViewLogic.onSaveInstanceState(outState);
 
         //Verify
-        verify(mDelegate).getToolbarTitle();
-        verify(mDelegate).updateToolbarText("Title > Kawasaki");
-        verify(mListingsStackProvider).addListing(categoryDataWithNoSubcategories);
-        verify(mEventBusProvider).postEvent(mListingsEventCaptor.capture());
-        verify(mDelegate, never()).presentFragment(any(Fragment.class), anyInt(), anyBoolean());
-        verify(mDelegate).closeSlidingPanel();
-
-        assertThat(mListingsEventCaptor.getValue().getEventType(), is(ListingsEvent.EventType.UpdateListings));
-        assertThat(mListingsEventCaptor.getValue().getCategoryNumber(), is("0001-0348-2948-8556-"));
-
+        verify(mStateSaverProvider).saveInt("State.Int",3, outState);
     }
 
     @Test
-    public void testOnEventCategorySelectedWithNoSubcategoriesTwice() {
+    public void testOnErrorViewClick() {
 
-        //Setup
-        Bundle bundleWithSubcategories = new Bundle();
-        CategoryData categoryDataWithSubcategories = generateCategoryDataWithSubcategories().get(0);
-        bundleWithSubcategories.putParcelable(CategoriesViewLogic.CATEGORY_DATA, categoryDataWithSubcategories);
-        CategoryEvent categoryEventWithSubcategories = new CategoryEvent(null, CategoryEvent.EventType.CategorySelected, bundleWithSubcategories);
-
-        Bundle bundleWithNoSubcategories = new Bundle();
-        CategoryData categoryDataWithNoSubcategories = generateCategoryDataWithNoSubcategories().get(0);
-        bundleWithNoSubcategories.putParcelable(CategoriesViewLogic.CATEGORY_DATA, categoryDataWithNoSubcategories);
-        CategoryEvent categoryEventWithNoSubcategories = new CategoryEvent(null, CategoryEvent.EventType.CategorySelected, bundleWithNoSubcategories);
-
-        when(mListingsStackProvider.getTopListing()).thenReturn(categoryDataWithSubcategories);
-        when(mListingsStackProvider.isViewingNonRootEmptySubcategory()).thenReturn(true);
-//        when(mListingsStackProvider.isEndOfSubcategory()).thenReturn(true);
-//        when(mListingsStackProvider.size()).thenReturn(2);
+        //Setup`
+        mCategoriesAndListingsProvider.requestAction = TestCategoriesAndListingsProvider.RequestAction.Failed;
 
         //Run
-        mViewLogic.initViewLogic(mDelegate, null);
-        mViewLogic.onEvent(categoryEventWithSubcategories);
-        reset(mDelegate, mEventBusProvider);
-        when(mDelegate.getToolbarTitle()).thenReturn("Title > Boats");
-        mViewLogic.onEvent(categoryEventWithNoSubcategories);
+        mViewLogic.initViewLogic(mDelegate, new Bundle(), null);
+        reset(mCategoriesAndListingsProvider);
+        mViewLogic.onErrorViewClick();
 
         //Verify
-        verify(mDelegate, times(2)).getToolbarTitle();
-        verify(mDelegate).updateToolbarText("Title > Boats > Kawasaki");
-        verify(mListingsStackProvider).removeListing();
-        verify(mListingsStackProvider).addListing(categoryDataWithNoSubcategories);
-        verify(mEventBusProvider).postEvent(mListingsEventCaptor.capture());
-        verify(mDelegate, never()).presentFragment(any(Fragment.class), anyInt(), anyBoolean());
-        verify(mDelegate).closeSlidingPanel();
+        verify(mCategoriesAndListingsProvider).getCategoriesData(mStringCaptor.capture(), mCategoriesRequestDelegateCaptor.capture());
+    }
 
-        assertThat(mListingsEventCaptor.getValue().getEventType(), is(ListingsEvent.EventType.UpdateListings));
-        assertThat(mListingsEventCaptor.getValue().getCategoryNumber(), is("0001-0348-2948-8556-"));
+
+
+    /**
+     * Test class to simulate the CategoriesAndListingsProvider.
+     */
+    private static class TestCategoriesAndListingsProvider implements CategoriesAndListingsProvider {
+
+        public enum RequestAction {
+            None,
+            Success,
+            Failed
+        }
+
+        public RequestAction requestAction;
+        public List<CategoryData> requestResult;
+
+        public TestCategoriesAndListingsProvider() {
+            requestAction = RequestAction.None;
+        }
+
+        @Override
+        public void getCategoriesData(@Nullable String categoryNumber, @NonNull CategoriesRequestDelegate requestDelegate) {
+
+            switch (requestAction) {
+                case Success:
+                    requestDelegate.requestSuccess(requestResult);
+                    break;
+                case Failed:
+                    requestDelegate.requestFailed();
+                    break;
+            }
+        }
+
+        @Override
+        public void getListingsData(@Nullable String categoryNumber, @NonNull ListingsRequestDelegate requestDelegate) {
+
+        }
 
     }
 
-    @Test
-    public void testOnEventCategoryLayoutReady() {
-
-        //Setup
-        CategoryEvent categoryEvent = new CategoryEvent(null, CategoryEvent.EventType.CategoryLayoutReady, new Bundle());
-
-        //Run
-        mViewLogic.initViewLogic(mDelegate, null);
-        mViewLogic.onEvent(categoryEvent);
-
-        //Verify
-        verify(mDelegate).setSlidingPanelScrollableView();
-    }
-
-    @Test
-    public void testOnBackPressedEndOfSubcategory() {
-
-        //Setup
-        when(mListingsStackProvider.isViewingNonRootEmptySubcategory()).thenReturn(true);
-        when(mListingsStackProvider.isListingsEmpty()).thenReturn(true);
-        //Run
-        mViewLogic.initViewLogic(mDelegate, null);
-        boolean result = mViewLogic.onBackPressed();
-
-        //Verify
-        verify(mEventBusProvider).postEvent(mCategoryEventCaptor.capture());
-        assertThat(mCategoryEventCaptor.getValue().getEventType(), is(CategoryEvent.EventType.ClearCategorySelection));
-        assertThat(result, is(false));
-    }
-
-    @Test
-    public void testOnBackPressedNotEndOfSubcategory() {
-
-        //Setup
-        when(mListingsStackProvider.isViewingNonRootEmptySubcategory()).thenReturn(false);
-        when(mListingsStackProvider.isListingsEmpty()).thenReturn(true);
-        //Run
-        mViewLogic.initViewLogic(mDelegate, null);
-        boolean result = mViewLogic.onBackPressed();
-
-        //Verify
-        verify(mEventBusProvider,never()).postEvent(any(CategoryEvent.class));
-        assertThat(result, is(true));
-    }
-
-    @Test
-    public void testOnBackPressedRemoveListing() {
-
-        //Setup
-        when(mListingsStackProvider.isListingsEmpty()).thenReturn(true);
-
-        //Run
-        mViewLogic.initViewLogic(mDelegate, null);
-        mViewLogic.onBackPressed();
-
-        //Verify
-        verify(mListingsStackProvider).removeListing();
-    }
-
-    @Test
-    public void testOnBackPressedUpdateToolbarAndListings() {
-
-        //Setup
-        CategoryData categoryDataWithSubcategories = generateCategoryDataWithSubcategories().get(0);
-        when(mListingsStackProvider.getTopListing()).thenReturn(categoryDataWithSubcategories);
-        when(mListingsStackProvider.isListingsEmpty()).thenReturn(false);
-        when(mDelegate.getToolbarTitle()).thenReturn("Title > Books");
-
-        //Run
-        mViewLogic.initViewLogic(mDelegate, null);
-        mViewLogic.onBackPressed();
-
-        //Verify
-        verify(mEventBusProvider).postEvent(mListingsEventCaptor.capture());
-        verify(mDelegate).setSlidingPanelScrollableView();
-        verify(mDelegate).updateToolbarText("Title");
-
-        assertThat(mListingsEventCaptor.getValue().getEventType(), is(ListingsEvent.EventType.UpdateListings));
-        assertThat(mListingsEventCaptor.getValue().getCategoryNumber(), is("0001-0348-1261-"));
-    }
-
-    @Test
-    public void testOnBackPressedSetSlidingPanelView() {
-
-        //Setup
-        when(mListingsStackProvider.isListingsEmpty()).thenReturn(true);
-
-        //Run
-        mViewLogic.initViewLogic(mDelegate, null);
-        mViewLogic.onBackPressed();
-
-        //Verify
-        verify(mDelegate).setSlidingPanelScrollableView();
-    }
 
     private List<CategoryData> generateCategoryDataWithNoSubcategories() {
         return parseJson(SAMPLE_CATEGORY_DATA_WITH_NO_SUBCATEGORIES);
@@ -731,4 +667,5 @@ public class CategoriesAndListingsViewLogicTest {
             "  ],\n" +
             "  \"HasClassifieds\": true\n" +
             "}";
+
 }
