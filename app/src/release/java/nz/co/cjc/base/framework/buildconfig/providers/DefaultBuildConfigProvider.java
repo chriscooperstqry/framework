@@ -1,4 +1,5 @@
-package nz.co.cjc.framework.buildconfig.providers;
+package nz.co.cjc.base.framework.buildconfig.providers;
+
 
 import nz.co.cjc.base.framework.buildconfig.providers.contracts.BuildConfigProvider;
 

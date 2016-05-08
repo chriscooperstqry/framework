@@ -1,4 +1,4 @@
-package nz.co.cjc.framework.logging.providers;
+package nz.co.cjc.base.framework.logging.providers;
 
 import android.support.annotation.NonNull;
 
