@@ -24,6 +24,8 @@ import nz.co.cjc.base.framework.application.MainApp;
  * Created by Chris Cooper on 5/05/16.
  * <p/>
  * Fragment to display the listings related to a category received from the api
+ * <p/>
+ * Simple list view, only updates when told to via hosting activity
  */
 public class ListingsFragment extends Fragment {
 
@@ -34,6 +36,7 @@ public class ListingsFragment extends Fragment {
     @Inject
     ListingsViewLogic mViewLogic;
 
+    //region public
     @NonNull
     public static ListingsFragment newInstance() {
         return new ListingsFragment();
@@ -93,7 +96,9 @@ public class ListingsFragment extends Fragment {
             mViewLogic.onSaveInstanceState(outState);
         }
     }
+    //end region
 
+    //region private
     private void initUI(View view) {
         mListView = ButterKnife.findById(view, R.id.list_view);
         mAdapter = new ListingsAdapter();
@@ -101,6 +106,7 @@ public class ListingsFragment extends Fragment {
 
         mListView.setAdapter(mAdapter);
     }
+    //end region
 
     private ListingsViewLogic.ViewLogicDelegate mViewLogicDelegate = new ListingsViewLogic.ViewLogicDelegate() {
 

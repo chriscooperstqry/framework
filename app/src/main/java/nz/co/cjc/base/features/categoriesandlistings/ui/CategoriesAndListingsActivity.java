@@ -18,8 +18,15 @@ import nz.co.cjc.base.framework.application.MainApp;
 /**
  * Created by Chris Cooper on 4/05/16.
  * <p>
- * Activity to let the user browse the categories and potentially the listings also
- * if the user is using a tablet
+ * Activity to let the user browse the categories and listings
+ *
+ * Involves 2 fragments, one containing the categories, one containing the listings
+ * Both will always be on the screen
+ *
+ * When on a small device, categories fragment will appear in a sliding drawer down the bottom
+ * over top of the listings
+ *
+ * On larger devices they will appear side by side
  */
 public class CategoriesAndListingsActivity extends CoreActivity {
 

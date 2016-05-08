@@ -22,7 +22,7 @@ import nz.co.cjc.base.framework.strings.providers.contracts.StringsProvider;
 
 /**
  * Created by Chris Cooper on 4/05/16.
- * <p>
+ * <p/>
  * View logic for the categories fragment
  */
 public class CategoriesViewLogic extends BaseViewLogic<CategoriesViewLogic.ViewLogicDelegate> implements EventBusSubscriber {
@@ -48,6 +48,7 @@ public class CategoriesViewLogic extends BaseViewLogic<CategoriesViewLogic.ViewL
         mStateSaverProvider = stateSaverProvider;
     }
 
+    // region public
     public void initViewLogic(@Nullable ViewLogicDelegate delegate, @NonNull Bundle arguments, @Nullable Bundle savedInstanceState) {
         setDelegate(delegate);
 
@@ -55,10 +56,12 @@ public class CategoriesViewLogic extends BaseViewLogic<CategoriesViewLogic.ViewL
         mCategoryItems = new ArrayList<>();
         mSelectedItem = -1;
 
+        //Get the saved selected position when rotating the screen
         if (savedInstanceState != null) {
             mSelectedItem = mStateSaverProvider.getInt(StateSaverProvider.STATE_INT, savedInstanceState, -1);
         }
 
+        //Only load the data if we haven't been supplied it by the previous fragment
         if (categoryData != null && !categoryData.getSubCategories().isEmpty()) {
             mCategoryItems = categoryData.getSubCategories();
             mDelegate.populateScreen(mCategoryItems);
@@ -69,25 +72,6 @@ public class CategoriesViewLogic extends BaseViewLogic<CategoriesViewLogic.ViewL
 
     }
 
-    private void fetchData() {
-        mDelegate.showProgressBar();
-        mDelegate.hideErrorView();
-
-        mCategoriesAndListingsProvider.getCategoriesData(null, new CategoriesAndListingsProvider.CategoriesRequestDelegate() {
-            @Override
-            public void requestSuccess(@NonNull List<CategoryData> categories) {
-                mCategoryItems = categories;
-                mDelegate.populateScreen(categories);
-                mDelegate.hideProgressBar();
-            }
-
-            @Override
-            public void requestFailed() {
-                mDelegate.hideProgressBar();
-                mDelegate.showErrorView();
-            }
-        });
-    }
 
     public void listItemSelected(int position) {
         CategoryData item = mCategoryItems.get(position);
@@ -95,14 +79,18 @@ public class CategoriesViewLogic extends BaseViewLogic<CategoriesViewLogic.ViewL
         Bundle bundle = new Bundle();
         bundle.putParcelable(CATEGORY_DATA, item);
 
+        //Tell the hosting activity we have selected a category
         mEventBusProvider.postEvent(new CategoryEvent(null, CategoryEvent.EventType.CategorySelected, bundle));
 
+        //Update the selection if possible
         if (item.getSubCategories().isEmpty()) {
             mDelegate.setSelectedItem(position);
             mSelectedItem = position;
         }
     }
 
+    //Tell the hosting activity our layout is done so we can set the sliding panel scroll view
+    //with this current fragments list view
     public void screenResumed() {
         subscribeToEventBus();
         mEventBusProvider.postEvent(new CategoryEvent(null, CategoryEvent.EventType.CategoryLayoutReady, null));
@@ -126,6 +114,7 @@ public class CategoriesViewLogic extends BaseViewLogic<CategoriesViewLogic.ViewL
     @Subscribe
     public void onEvent(@NonNull CategoryEvent event) {
         switch (event.getEventType()) {
+            //Remove the current highlighted list selection
             case ClearCategorySelection:
                 mSelectedItem = -1;
                 mDelegate.setSelectedItem(-1);
@@ -133,6 +122,7 @@ public class CategoriesViewLogic extends BaseViewLogic<CategoriesViewLogic.ViewL
         }
     }
 
+    //Store the current selection
     public void onSaveInstanceState(@NonNull Bundle outState) {
         mStateSaverProvider.saveInt(StateSaverProvider.STATE_INT, mSelectedItem, outState);
     }
@@ -140,6 +130,30 @@ public class CategoriesViewLogic extends BaseViewLogic<CategoriesViewLogic.ViewL
     public void onErrorViewClick() {
         fetchData();
     }
+
+    //end region
+
+    //region private
+    private void fetchData() {
+        mDelegate.showProgressBar();
+        mDelegate.hideErrorView();
+
+        mCategoriesAndListingsProvider.getCategoriesData(null, new CategoriesAndListingsProvider.CategoriesRequestDelegate() {
+            @Override
+            public void requestSuccess(@NonNull List<CategoryData> categories) {
+                mCategoryItems = categories;
+                mDelegate.populateScreen(categories);
+                mDelegate.hideProgressBar();
+            }
+
+            @Override
+            public void requestFailed() {
+                mDelegate.hideProgressBar();
+                mDelegate.showErrorView();
+            }
+        });
+    }
+    //end region
 
     public interface ViewLogicDelegate {
 

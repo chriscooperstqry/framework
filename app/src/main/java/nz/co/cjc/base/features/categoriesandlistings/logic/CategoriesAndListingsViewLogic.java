@@ -33,6 +33,7 @@ public class CategoriesAndListingsViewLogic extends BaseViewLogic<CategoriesAndL
     private final EventBusProvider mEventBusProvider;
     private final ListingsStackProvider mListingsStackProvider;
 
+    //region public
     @Inject
     public CategoriesAndListingsViewLogic(@NonNull StringsProvider stringsProvider,
                                           @NonNull EventBusProvider eventBusProvider,
@@ -46,7 +47,9 @@ public class CategoriesAndListingsViewLogic extends BaseViewLogic<CategoriesAndL
     public void initViewLogic(@Nullable ViewLogicDelegate delegate, @Nullable Bundle savedInstanceState) {
         setDelegate(delegate);
 
+        //Only load fragments when not coming from a saved instance
         if (savedInstanceState == null) {
+            //Add the first instance to the stack representing the home page
             mListingsStackProvider.addListing(new CategoryData());
             CategoriesFragment categoriesFragment = CategoriesFragment.newInstance(new Bundle());
             mDelegate.presentFragment(categoriesFragment, R.id.categories_container, false);
@@ -71,6 +74,7 @@ public class CategoriesAndListingsViewLogic extends BaseViewLogic<CategoriesAndL
         switch (event.getEventType()) {
             case CategorySelected:
 
+                //Must have category data to continue
                 if (event.getBundle() == null || event.getBundle().getParcelable(CategoriesViewLogic.CATEGORY_DATA) == null) {
                     throw new IllegalArgumentException("Must provide category data");
                 }
@@ -80,6 +84,7 @@ public class CategoriesAndListingsViewLogic extends BaseViewLogic<CategoriesAndL
                 String categoryNumber = categoryData.getNumber();
 
                 //If there are more other sub categories to drill into
+                //Then display a new frag with the next level of sub categories
                 if (!datasSubcategories.isEmpty()) {
 
                     updateAndNotify(categoryData, categoryNumber);
@@ -144,28 +149,37 @@ public class CategoriesAndListingsViewLogic extends BaseViewLogic<CategoriesAndL
             mEventBusProvider.postEvent(new ListingsEvent(null, ListingsEvent.EventType.UpdateListings, mListingsStackProvider.getTopListing().getNumber()));
         }
 
+        //
         mDelegate.setSlidingPanelScrollableView();
 
         return bubbleUp;
     }
+    //end region
 
+    //region private
+
+    //Update the title bar with the current category tree
+    //Add the current listing view on the stack
+    //Tell the listing fragment to update with the latest listings
     private void updateAndNotify(CategoryData categoryData, String categoryNumber) {
         addToolbarText(categoryData.getName());
         mListingsStackProvider.addListing(categoryData);
         mEventBusProvider.postEvent(new ListingsEvent(null, ListingsEvent.EventType.UpdateListings, categoryNumber));
-
     }
 
+    //Appends the next category in the tree to the title bar
     private void addToolbarText(String text) {
         String current = mDelegate.getToolbarTitle();
         mDelegate.updateToolbarText(current + " > " + text);
     }
 
+    //Removes the current category from the title bar text tree
     private void removeToolbarText() {
         String current = mDelegate.getToolbarTitle();
         current = current.substring(0, current.lastIndexOf(" > "));
         mDelegate.updateToolbarText(current);
     }
+    //end region
 
     public interface ViewLogicDelegate {
 

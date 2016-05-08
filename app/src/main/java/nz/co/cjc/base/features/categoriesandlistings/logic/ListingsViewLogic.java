@@ -24,7 +24,7 @@ import nz.co.cjc.base.framework.utils.StringUtils;
 
 /**
  * Created by Chris Cooper on 5/05/16.
- * <p>
+ * <p/>
  * View logic for the listings fragment
  */
 public class ListingsViewLogic extends BaseViewLogic<ListingsViewLogic.ViewLogicDelegate> implements EventBusSubscriber {
@@ -47,37 +47,25 @@ public class ListingsViewLogic extends BaseViewLogic<ListingsViewLogic.ViewLogic
         mStateSaverProvider = stateSaverProvider;
     }
 
+    //region public
     public void initViewLogic(@Nullable ViewLogicDelegate delegate, @Nullable Bundle savedInstanceState) {
         setDelegate(delegate);
 
         mListingItems = new ArrayList<>();
 
-        if(savedInstanceState!=null && mStateSaverProvider.getParcelableArrayList(StateSaverProvider.STATE_PARCELABLE_ARRAY_LIST, savedInstanceState) !=null){
+        //Get the saved listings data on device rotation
+        if (savedInstanceState != null && mStateSaverProvider.getParcelableArrayList(StateSaverProvider.STATE_PARCELABLE_ARRAY_LIST, savedInstanceState) != null) {
             mListingItems = mStateSaverProvider.getParcelableArrayList(StateSaverProvider.STATE_PARCELABLE_ARRAY_LIST, savedInstanceState);
             mDelegate.populateScreen(mListingItems);
         }
-    }
-
-    private void getListings(String categoryNumber) {
-
-        mCategoriesAndListingsProvider.getListingsData(categoryNumber, new CategoriesAndListingsProvider.ListingsRequestDelegate() {
-            @Override
-            public void requestSuccess(@NonNull List<ListingData> listings) {
-                mListingItems = listings;
-                mDelegate.populateScreen(listings);
-            }
-
-            @Override
-            public void requestFailed() {
-                //TODO present error
-            }
-        });
     }
 
     @SuppressWarnings("unused")
     @Subscribe
     public void onEvent(@NonNull ListingsEvent event) {
         switch (event.getEventType()) {
+            //Told by hosting activity to update the listings,
+            //Or if no category number specified, clear the list items (on home page)
             case UpdateListings:
                 if (StringUtils.isEmpty(event.getCategoryNumber())) {
                     mListingItems.clear();
@@ -109,9 +97,29 @@ public class ListingsViewLogic extends BaseViewLogic<ListingsViewLogic.ViewLogic
         mEventBusProvider.unsubscribe(this);
     }
 
+    //Store the listings data
     public void onSaveInstanceState(@NonNull Bundle outState) {
         mStateSaverProvider.saveParcelableArrayList(StateSaverProvider.STATE_PARCELABLE_ARRAY_LIST, (ArrayList<? extends Parcelable>) mListingItems, outState);
     }
+    //end region
+
+    //region private
+    private void getListings(String categoryNumber) {
+
+        mCategoriesAndListingsProvider.getListingsData(categoryNumber, new CategoriesAndListingsProvider.ListingsRequestDelegate() {
+            @Override
+            public void requestSuccess(@NonNull List<ListingData> listings) {
+                mListingItems = listings;
+                mDelegate.populateScreen(listings);
+            }
+
+            @Override
+            public void requestFailed() {
+                //TODO present error
+            }
+        });
+    }
+    //end region
 
     public interface ViewLogicDelegate {
         /**

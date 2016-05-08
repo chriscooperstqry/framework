@@ -28,6 +28,11 @@ import nz.co.cjc.base.framework.constants.AppConstants;
  * Created by Chris Cooper on 4/05/16.
  * <p>
  * Fragment to display the categories received from the api
+ *
+ * Will either be displayed inside a sliding panel on small devices, or
+ * just next to the listings fragment on larger devices.
+ *
+ * Contains a simple list view for displaying the categories
  */
 public class CategoriesFragment extends Fragment {
 
