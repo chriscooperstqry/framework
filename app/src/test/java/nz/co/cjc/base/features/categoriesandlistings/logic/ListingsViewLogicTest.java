@@ -136,6 +136,7 @@ public class ListingsViewLogicTest {
 
         //Verify
         verify(mCategoriesAndListingsProvider).getListingsData(mStringCaptor.capture(), mCategoriesRequestDelegateCaptor.capture());
+        verify(mDelegate).hideMessage();
         verify(mDelegate).populateScreen(resultData);
 
         assertThat(mStringCaptor.getValue(), is("8"));
@@ -153,6 +154,7 @@ public class ListingsViewLogicTest {
 
         //Verify
         verify(mCategoriesAndListingsProvider).getListingsData(mStringCaptor.capture(), mCategoriesRequestDelegateCaptor.capture());
+        verify(mDelegate).hideMessage();
         verify(mDelegate, never()).populateScreen(anyListOf(ListingData.class));
 
         assertThat(mStringCaptor.getValue(), is("8"));
@@ -169,6 +171,7 @@ public class ListingsViewLogicTest {
 
         //Verify
         verify(mCategoriesAndListingsProvider, never()).getListingsData(mStringCaptor.capture(), mCategoriesRequestDelegateCaptor.capture());
+        verify(mDelegate).showMessage();
         verify(mDelegate).populateScreen(mListingsDataListCaptor.capture());
 
         assertThat(mListingsDataListCaptor.getValue().size(), is(0));

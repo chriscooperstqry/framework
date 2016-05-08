@@ -7,6 +7,7 @@
     <string name="error_text">Something went wrong.\nPlease check your network settings and tap to
         retry
     </string>
+    <string name="please_select_a_category">Please select a category</string>
 
     <!-- Dimens -->
     <dimen name="view_holder_category_name_margins">16dp</dimen>
