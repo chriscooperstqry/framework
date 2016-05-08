@@ -8,7 +8,6 @@ android {
     buildToolsVersion "23.0.3"
 
     defaultConfig {
-        applicationId "nz.co.cjc.framework"
         minSdkVersion 16
         targetSdkVersion 23
         versionCode 1
@@ -19,7 +18,8 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled true
+            minifyEnabled false
+            debuggable true
             zipAlignEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -37,6 +37,26 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_7
         targetCompatibility JavaVersion.VERSION_1_7
+    }
+
+    productFlavors {
+        App {
+            applicationId "nz.co.cjc.framework"
+            versionCode 1000000
+            versionName "1.0.0"
+        }
+
+    }
+
+    signingConfigs {
+        releaseApp {
+            storeFile file('release_app.jks')
+            storePassword getEnvironmentProperty('APP_KEY_STORE_PASSWORD')
+            keyAlias getEnvironmentProperty('APP_KEY_ALIAS')
+            keyPassword getEnvironmentProperty('APP_KEY_ALIAS_PASSWORD')
+        }
+        productFlavors.App.signingConfig signingConfigs.releaseApp
+
     }
 }
 
@@ -107,4 +127,27 @@ dependencies {
     androidTestCompile 'com.android.support.test:rules:0.4.1'
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.1'
     androidTestCompile 'com.android.support.test.espresso:espresso-intents:2.2.1'
+}
+
+// This method is used to find environment key/value pairs, used for signing builds
+def getEnvironmentProperty(key) {
+    def result = ''
+
+    // First see if the host environment has a project property for signing
+    if (project.hasProperty(key)) {
+        result = project.getProperty(key)
+    }
+
+    // Then check if there are environment variables set for signing -
+    // environment variables will override project property config.
+    if (System.getenv(key) != null) {
+        result = System.getenv(key)
+    }
+
+    return result
+}
+
+// Need to make the method globally available
+ext {
+    getEnvironmentProperty = this.&getEnvironmentProperty
 }
