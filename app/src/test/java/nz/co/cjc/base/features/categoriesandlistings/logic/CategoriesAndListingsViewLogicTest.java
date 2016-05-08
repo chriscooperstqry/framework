@@ -293,8 +293,6 @@ public class CategoriesAndListingsViewLogicTest {
 
         when(mListingsStackProvider.getTopListing()).thenReturn(categoryDataWithSubcategories);
         when(mListingsStackProvider.isViewingNonRootEmptySubcategory()).thenReturn(true);
-//        when(mListingsStackProvider.isEndOfSubcategory()).thenReturn(true);
-//        when(mListingsStackProvider.size()).thenReturn(2);
 
         //Run
         mViewLogic.initViewLogic(mDelegate, null);

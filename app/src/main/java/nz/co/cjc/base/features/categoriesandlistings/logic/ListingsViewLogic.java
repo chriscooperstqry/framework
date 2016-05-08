@@ -15,7 +15,6 @@ import javax.inject.Inject;
 import nz.co.cjc.base.features.categoriesandlistings.events.ListingsEvent;
 import nz.co.cjc.base.features.categoriesandlistings.models.ListingData;
 import nz.co.cjc.base.features.categoriesandlistings.providers.contract.CategoriesAndListingsProvider;
-import nz.co.cjc.base.framework.application.MainApp;
 import nz.co.cjc.base.framework.core.logic.BaseViewLogic;
 import nz.co.cjc.base.framework.eventbus.providers.contracts.EventBusProvider;
 import nz.co.cjc.base.framework.eventbus.providers.contracts.EventBusSubscriber;
@@ -71,7 +70,6 @@ public class ListingsViewLogic extends BaseViewLogic<ListingsViewLogic.ViewLogic
             @Override
             public void requestFailed() {
                 //TODO present error
-                MainApp.getDagger().getLoggingProvider().d("failed listings");
             }
         });
     }
