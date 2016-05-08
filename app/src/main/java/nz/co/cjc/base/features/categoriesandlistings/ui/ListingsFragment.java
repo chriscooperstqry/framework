@@ -8,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import java.util.List;
 
@@ -31,7 +30,7 @@ public class ListingsFragment extends Fragment {
 
     private ListView mListView;
     private ListingsAdapter mAdapter;
-    private TextView mTextView;
+    private View mNoResultsView;
 
     @Inject
     ListingsViewLogic mViewLogic;
@@ -76,7 +75,7 @@ public class ListingsFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         mListView = null;
-        mTextView = null;
+        mNoResultsView = null;
     }
 
     @Override
@@ -102,9 +101,11 @@ public class ListingsFragment extends Fragment {
     private void initUI(View view) {
         mListView = ButterKnife.findById(view, R.id.list_view);
         mAdapter = new ListingsAdapter();
-        mTextView = ButterKnife.findById(view, R.id.message);
 
         mListView.setAdapter(mAdapter);
+        mNoResultsView = ButterKnife.findById(view, R.id.empty_view);
+        mListView.setEmptyView(mNoResultsView);
+
     }
     //end region
 
@@ -115,15 +116,6 @@ public class ListingsFragment extends Fragment {
             mAdapter.setListingItems(listings);
         }
 
-        @Override
-        public void showMessage() {
-            mTextView.setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        public void hideMessage() {
-            mTextView.setVisibility(View.GONE);
-        }
     };
 
 }

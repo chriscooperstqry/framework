@@ -69,10 +69,8 @@ public class ListingsViewLogic extends BaseViewLogic<ListingsViewLogic.ViewLogic
             case UpdateListings:
                 if (StringUtils.isEmpty(event.getCategoryNumber())) {
                     mListingItems.clear();
-                    mDelegate.showMessage();
                     mDelegate.populateScreen(mListingItems);
                 } else {
-                    mDelegate.hideMessage();
                     getListings(event.getCategoryNumber());
                 }
                 break;
@@ -128,15 +126,6 @@ public class ListingsViewLogic extends BaseViewLogic<ListingsViewLogic.ViewLogic
          * @param listings to present
          */
         void populateScreen(@NonNull List<ListingData> listings);
-
-        /**
-         * Show text to begin
-         */
-        void showMessage();
-
-        /**
-         * Hide text to begin
-         */
-        void hideMessage();
+        
     }
 }
