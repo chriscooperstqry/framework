@@ -23,6 +23,7 @@
             android:gravity="center_vertical"
             android:maxLines="1"
             android:textSize="16sp"
+            android:singleLine="true"
             android:text="Home"
             android:textColor="@android:color/white"
             android:visibility="visible"
