@@ -1,7 +1,6 @@
 package nz.co.cjc.base.features.categoriesandlistings.logic;
 
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -58,16 +57,13 @@ public class CategoriesViewLogic extends BaseViewLogic<CategoriesViewLogic.ViewL
         mSelectedItem = -1;
 
         if (savedInstanceState != null) {
-            mCategoryItems = mStateSaverProvider.getParcelableArrayList(StateSaverProvider.STATE_PARCELABLE_ARRAY_LIST, savedInstanceState);
             mSelectedItem = mStateSaverProvider.getInt(StateSaverProvider.STATE_INT, savedInstanceState, -1);
-            mDelegate.populateScreen(mCategoryItems);
-            mDelegate.setSelectedItem(mSelectedItem);
-            return;
         }
 
         if (categoryData != null && !categoryData.getSubCategories().isEmpty()) {
             mCategoryItems = categoryData.getSubCategories();
             mDelegate.populateScreen(mCategoryItems);
+            mDelegate.setSelectedItem(mSelectedItem);
         } else {
             mCategoriesAndListingsProvider.getCategoriesData(null, new CategoriesAndListingsProvider.CategoriesRequestDelegate() {
                 @Override
@@ -125,13 +121,13 @@ public class CategoriesViewLogic extends BaseViewLogic<CategoriesViewLogic.ViewL
     public void onEvent(@NonNull CategoryEvent event) {
         switch (event.getEventType()) {
             case ClearCategorySelection:
+                mSelectedItem = -1;
                 mDelegate.setSelectedItem(-1);
                 break;
         }
     }
 
     public void onSaveInstanceState(@NonNull Bundle outState) {
-        mStateSaverProvider.saveParcelableArrayList(StateSaverProvider.STATE_PARCELABLE_ARRAY_LIST, (ArrayList<? extends Parcelable>) mCategoryItems, outState);
         mStateSaverProvider.saveInt(StateSaverProvider.STATE_INT, mSelectedItem, outState);
     }
 

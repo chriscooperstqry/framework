@@ -77,7 +77,7 @@ public class CategoriesAndListingsActivity extends CoreActivity {
 
             FragmentManager fragmentManager = getSupportFragmentManager();
             FragmentTransaction transaction = fragmentManager.beginTransaction();
-            transaction.add(fragmentContainerId, fragment);
+            transaction.replace(fragmentContainerId, fragment);
             if (addToBackStack) {
                 transaction.addToBackStack(null);
             }

@@ -53,7 +53,7 @@ public class ListingsViewLogic extends BaseViewLogic<ListingsViewLogic.ViewLogic
 
         mListingItems = new ArrayList<>();
 
-        if(savedInstanceState!=null){
+        if(savedInstanceState!=null && mStateSaverProvider.getParcelableArrayList(StateSaverProvider.STATE_PARCELABLE_ARRAY_LIST, savedInstanceState) !=null){
             mListingItems = mStateSaverProvider.getParcelableArrayList(StateSaverProvider.STATE_PARCELABLE_ARRAY_LIST, savedInstanceState);
             mDelegate.populateScreen(mListingItems);
         }
